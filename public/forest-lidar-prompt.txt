@@ -1,0 +1,7 @@
+Generator: built-in image_gen
+Use case: scientific-educational
+Asset: forest LiDAR analytics website background
+Prompt: Ultra detailed landscape scientific visualization of a dense forest point cloud, viewed from an elevated oblique aerial angle. Individually segmented crowns made of millions of crisp luminous LiDAR points in emerald, turquoise, cyan, blue, violet, coral and gold. Realistic varied heights, rounded and conifer crowns, visible trunks and ground returns. Forest concentrated in the right two thirds, fading into a dark pine green background; left third has space for website copy. Refined scientific rendering, delicate point texture and depth. No text, labels, logos, watermark or UI panels. Requested dimensions: 3840x2160.
+Actual generated dimensions: 1672x941.
+Export: resized with high quality bicubic interpolation to 3840x2160. The 4K export is upscaled, not a native 4K generation.
+Files: forest-lidar-generated.png (original); forest-lidar-4k.png (4K PNG); forest-lidar-4k.jpg (quality 92, optimized webpage asset).
