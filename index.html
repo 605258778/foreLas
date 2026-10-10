@@ -1,21 +1,28 @@
-﻿<!doctype html>
-<html lang="zh-CN">
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/fora/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="/fora/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#07110e" />
-    <meta name="description" content="FORA：面向森林研究的浏览器端 UAV LiDAR 点云分析平台。完成点云解析、单木分割、林分统计与生物量估算。" />
-    <meta name="keywords" content="森林分析, LiDAR, UAV, 点云, 单木分割, 林分统计" />
+    <meta name="description" content="三维激光点云林木分析系统 — 基于浏览器的无人机激光雷达森林点云分析平台。单木检测、区域统计、异速生长 DBH 与生物量估算。" />
+    <meta name="keywords" content="三维激光点云, 林木分析, LiDAR, 无人机, 森林, 点云, 单木分割, 浏览器端, 生物量" />
     <meta name="author" content="Burhan Gencal" />
-    <meta property="og:title" content="FORA — 森林点云分析平台" />
-    <meta property="og:description" content="从激光回波到单木级洞察。浏览器端完成森林点云分析，数据留在本地。" />
+    <meta property="og:title" content="三维激光点云林木分析系统" />
+    <meta property="og:description" content="基于浏览器的无人机激光雷达森林点云分析，无需安装。" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://fora-platform.github.io/fora" />
-    <title>FORA — 森林点云分析平台</title>
+    <title>三维激光点云林木分析系统</title>
     <style>
-      html, body, #root { margin: 0; min-height: 100%; width: 100%; }
-      body { min-height: 100vh; overflow-x: hidden; background: #07110e; }
+      html, body, #root {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        min-height: 100vh;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: #0a1410;
+      }
+      html { overflow-y: auto; }
+      body { overflow-x: hidden; }
     </style>
   </head>
   <body>
