@@ -1,18 +1,19 @@
 {
-  "name": "fora",
-  "version": "1.8.0",
-  "description": "FORA — An Open-Source browser-based platform for UAV-LiDAR forest point cloud analysis",
+  "name": "forelas",
+  "version": "2.1.0",
+  "description": "foreLas — 激光点云林木分析系统",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "deploy": "gh-pages -d dist",
-    "test": "node --test test/"
+    "test": "node --test"
   },
-  "author": "Burhan Gencal <burhan.gencal@btu.edu.tr>",
+  "author": "贵州嘉绿科技咨询有限公司",
+  "contributors": ["Burhan Gencal <burhan.gencal@btu.edu.tr>"],
   "license": "MIT",
-  "homepage": "https://fora-platform.github.io/fora",
+  "homepage": "/foreLas/",
   "repository": {
     "type": "git",
     "url": "https://github.com/fora-platform/fora.git"

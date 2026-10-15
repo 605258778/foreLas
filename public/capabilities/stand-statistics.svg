@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="300" viewBox="0 0 640 300" role="img" aria-labelledby="title desc">
+<title id="title">林分结构统计示意</title><desc id="desc">林分高度剖面叠加高度分位线，右侧直方图表示树高分布和林分统计。</desc>
+<defs>
+ <radialGradient id="bg"><stop stop-color="#174237"/><stop offset="1" stop-color="#071e18"/></radialGradient>
+ <linearGradient id="height" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#45b5dd"/><stop offset=".5" stop-color="#8ce8a4"/><stop offset="1" stop-color="#f4cf7b"/></linearGradient>
+ <linearGradient id="bar" x2="0" y2="1"><stop stop-color="#94efb6"/><stop offset="1" stop-color="#268767"/></linearGradient>
+</defs>
+<rect width="640" height="300" fill="url(#bg)"/>
+<g stroke="#8be9b2" stroke-opacity=".055" stroke-width="1">
+<path d="M0 0V300"/>
+<path d="M32 0V300"/>
+<path d="M64 0V300"/>
+<path d="M96 0V300"/>
+<path d="M128 0V300"/>
+<path d="M160 0V300"/>
+<path d="M192 0V300"/>
+<path d="M224 0V300"/>
+<path d="M256 0V300"/>
+<path d="M288 0V300"/>
+<path d="M320 0V300"/>
+<path d="M352 0V300"/>
+<path d="M384 0V300"/>
+<path d="M416 0V300"/>
+<path d="M448 0V300"/>
+<path d="M480 0V300"/>
+<path d="M512 0V300"/>
+<path d="M544 0V300"/>
+<path d="M576 0V300"/>
+<path d="M608 0V300"/>
+<path d="M640 0V300"/>
+<path d="M0 12H640"/>
+<path d="M0 44H640"/>
+<path d="M0 76H640"/>
+<path d="M0 108H640"/>
+<path d="M0 140H640"/>
+<path d="M0 172H640"/>
+<path d="M0 204H640"/>
+<path d="M0 236H640"/>
+<path d="M0 268H640"/>
+<path d="M0 300H640"/>
+</g>
+<text x="35" y="31" fill="#a4cbb9" font-family="Segoe UI,Arial,sans-serif" font-size="10" letter-spacing="1.5" text-anchor="start">STAND HEIGHT DISTRIBUTION</text>
+<path d="M85 81H355" stroke="#d9c583" stroke-opacity=".6" stroke-dasharray="5 5"/>
+<text x="39" y="85" fill="#dbc98e" font-family="Segoe UI,Arial,sans-serif" font-size="10" letter-spacing="1.5" text-anchor="start">H95</text>
+<path d="M85 145H355" stroke="#d9c583" stroke-opacity=".6" stroke-dasharray="5 5"/>
+<text x="39" y="149" fill="#dbc98e" font-family="Segoe UI,Arial,sans-serif" font-size="10" letter-spacing="1.5" text-anchor="start">H50</text>
+<path d="M96 238V174" stroke="#6db28c" stroke-opacity=".8" stroke-width="2"/>
+<path d="M96 151l-12 30h6l-10 23h32l-10 -23h6Z" fill="#6bd39a" fill-opacity="0.25" stroke="#8fe6ad" stroke-opacity=".5"/>
+<path d="M118 238V133" stroke="#6db28c" stroke-opacity=".8" stroke-width="2"/>
+<path d="M118 110l-12 30h6l-10 23h32l-10 -23h6Z" fill="#6bd39a" fill-opacity="0.37" stroke="#8fe6ad" stroke-opacity=".5"/>
+<path d="M140 238V155" stroke="#6db28c" stroke-opacity=".8" stroke-width="2"/>
+<path d="M140 132l-12 30h6l-10 23h32l-10 -23h6Z" fill="#6bd39a" fill-opacity="0.49" stroke="#8fe6ad" stroke-opacity=".5"/>
+<path d="M162 238V104" stroke="#6db28c" stroke-opacity=".8" stroke-width="2"/>
+<path d="M162 81l-12 30h6l-10 23h32l-10 -23h6Z" fill="#6bd39a" fill-opacity="0.25" stroke="#8fe6ad" stroke-opacity=".5"/>
+<path d="M184 238V143" stroke="#6db28c" stroke-opacity=".8" stroke-width="2"/>
+<path d="M184 120l-12 30h6l-10 23h32l-10 -23h6Z" fill="#6bd39a" fill-opacity="0.37" stroke="#8fe6ad" stroke-opacity=".5"/>
+<path d="M206 238V119" stroke="#6db28c" stroke-opacity=".8" stroke-width="2"/>
+<path d="M206 96l-12 30h6l-10 23h32l-10 -23h6Z" fill="#6bd39a" fill-opacity="0.49" stroke="#8fe6ad" stroke-opacity=".5"/>
+<path d="M228 238V88" stroke="#6db28c" stroke-opacity=".8" stroke-width="2"/>
+<path d="M228 65l-12 30h6l-10 23h32l-10 -23h6Z" fill="#6bd39a" fill-opacity="0.25" stroke="#8fe6ad" stroke-opacity=".5"/>
+<path d="M250 238V134" stroke="#6db28c" stroke-opacity=".8" stroke-width="2"/>
+<path d="M250 111l-12 30h6l-10 23h32l-10 -23h6Z" fill="#6bd39a" fill-opacity="0.37" stroke="#8fe6ad" stroke-opacity=".5"/>
+<path d="M272 238V106" stroke="#6db28c" stroke-opacity=".8" stroke-width="2"/>
+<path d="M272 83l-12 30h6l-10 23h32l-10 -23h6Z" fill="#6bd39a" fill-opacity="0.49" stroke="#8fe6ad" stroke-opacity=".5"/>
+<path d="M294 238V152" stroke="#6db28c" stroke-opacity=".8" stroke-width="2"/>
+<path d="M294 129l-12 30h6l-10 23h32l-10 -23h6Z" fill="#6bd39a" fill-opacity="0.25" stroke="#8fe6ad" stroke-opacity=".5"/>
+<path d="M316 238V124" stroke="#6db28c" stroke-opacity=".8" stroke-width="2"/>
+<path d="M316 101l-12 30h6l-10 23h32l-10 -23h6Z" fill="#6bd39a" fill-opacity="0.37" stroke="#8fe6ad" stroke-opacity=".5"/>
+<path d="M338 238V170" stroke="#6db28c" stroke-opacity=".8" stroke-width="2"/>
+<path d="M338 147l-12 30h6l-10 23h32l-10 -23h6Z" fill="#6bd39a" fill-opacity="0.49" stroke="#8fe6ad" stroke-opacity=".5"/>
+<path d="M85 60v180h270" fill="none" stroke="#77aa95" stroke-opacity=".6"/>
+<text x="200" y="267" fill="#a4cbb9" font-family="Segoe UI,Arial,sans-serif" font-size="10" letter-spacing="1.5" text-anchor="middle">CANOPY PROFILE</text>
+<rect x="387" y="61" width="212" height="183" rx="10" fill="#061c17" fill-opacity=".7" stroke="#426b58"/>
+<text x="405" y="86" fill="#bedfcd" font-family="Segoe UI,Arial,sans-serif" font-size="10" letter-spacing="1.5" text-anchor="start">HEIGHT / m</text>
+<rect x="408" y="188" width="17" height="28" rx="3" fill="url(#bar)" opacity="0.50"/>
+<rect x="433" y="167" width="17" height="49" rx="3" fill="url(#bar)" opacity="0.56"/>
+<rect x="458" y="132" width="17" height="84" rx="3" fill="url(#bar)" opacity="0.62"/>
+<rect x="483" y="110" width="17" height="106" rx="3" fill="url(#bar)" opacity="0.68"/>
+<rect x="508" y="137" width="17" height="79" rx="3" fill="url(#bar)" opacity="0.74"/>
+<rect x="533" y="170" width="17" height="46" rx="3" fill="url(#bar)" opacity="0.80"/>
+<rect x="558" y="194" width="17" height="22" rx="3" fill="url(#bar)" opacity="0.86"/>
+<path d="M405 218h176" stroke="#5b947c"/>
+<text x="411" y="234" fill="#a4cbb9" font-family="Segoe UI,Arial,sans-serif" font-size="8" letter-spacing="1.5" text-anchor="start">0</text>
+<text x="567" y="234" fill="#a4cbb9" font-family="Segoe UI,Arial,sans-serif" font-size="8" letter-spacing="1.5" text-anchor="start">30</text>
+<text x="494" y="267" fill="#a4cbb9" font-family="Segoe UI,Arial,sans-serif" font-size="10" letter-spacing="1.5" text-anchor="middle">DENSITY / COVER</text>
+</svg>

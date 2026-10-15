@@ -1,0 +1,749 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<style>
+    .table_top_border {border-top: 1px solid black; }
+    .table_top_border2 {border-top: 1px solid black; }
+    .table_bottom_border {border-bottom: 1px solid black; }
+    .table_bottom_border2 {border-bottom: 1px solid black; }
+    .table_left_border2 {border-left: 1px solid black; }
+    .table_right_border2 {border-right: 1px solid black; }
+    .table_border tr td {border: 1px solid black; }
+    underline {border-bottom: 1px solid black;}
+    .shadingborder {border: 1px solid black; padding: 1px; font-weight: normal; }
+    styled-content[style-type="shadingborder"]{border: 1px solid black; padding: 1px; font-weight: normal; }
+    p, .article_title_cn, .author_name_list, .affiliation_list, .abs, .key, .caption {word-wrap:break-word; }
+    .citation .ckwxbreak {word-wrap: break-word; display:block; max-width: 1160px; }
+</style>
+<meta http-equiv="X-UA-Compatible" content="IE=8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="css/html_new.css">
+<script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+<script type="text/x-mathjax-config">
+		MathJax.Hub.Config({tex2jax: {inlineMath: [['$', '$'],  ['\\(', '\\)']]}});
+</script>
+<script type="text/javascript"
+	  src="http://120.27.31.57/platformTools/js/MathJax-master/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+
+<!-- 语言 -->
+<meta name="dc.language" content="cn" />
+<!-- 输出格式 default -->
+<meta name="dc.format" content="text/html" />
+<!-- 标题 -->
+<meta name="dc.title" content="基于高分辨率卫星图像的立木材积表的编制" />
+<meta name="dc.title" xml:lang="en" content="Compiling the Standing Volume Table of Chinese Fir Based on the High-Resolution Satellite Image" />
+<!-- 摘要 -->
+<meta name="dc.description" content="以QuickBird卫星图像和杉木为研究对象，在对图像进行精处理的基础上，通过在图像上测定出杉木冠幅，建立了胸径和冠幅的一元回归模型：<i>D</i><sub>1.3</sub>=2.221+4.393<i>C</i><sub>k</sub>，由不同冠幅值计算出的胸径查一元材积表，据此编制出一元卫星图像立木材积表；根据图像上测算出树高和冠幅，建立了二元回归模型：<i>V</i>=-0.246 05+0.013 806<i>C</i><sub>k</sub>+0.035 263 <i>H</i>，据此编制出了卫星图像二元立木材积表。杉木在图像上的高是通过建立杉木树高与胸径关系模型：<img src='PIC/lykx-40-4-33-M1.jpg'/>测算得来。" />
+<meta name="dc.description" xml:lang="en" content="This paper focused on how to compile volume table of Chinese Fir according to High-resolution QuickBird image, the method is the following:The crown width of fir was measured on the intensive processed QuickBird image, and single element regression model of crown width—height of breast was built: <i>D</i><sub>1.3</sub>=2.221+4.393<i>C</i><sub>k</sub>, volume of each fir tree can be looked up in the single element volume table according to different value of <i>D</i><sub>1.3</sub> in different crown width, so mono-factor volume table can be compiled. Binary regression equation, <i>V</i>=-0.246 05+0.013 806<i>C</i><sub>k</sub>+0.035 263 <i>H</i>, was modeled according to height and crown breadth measured on the image. The height of thee on the image can be gained by the following model:<img src='PIC/lykx-40-4-33-M1.jpg'/>.Dual-factor volume table was then compiled." />
+<!-- 循环输出关键词 -->
+<meta name="dc.subject" content="QuickBird卫星图像" />
+<meta name="dc.subject" content="建模" />
+<meta name="dc.subject" content="杉木" />
+<meta name="dc.subject" content="立木材积表" />
+<meta name="dc.subject" xml:lang="en" content="QuickBird satellite image" />
+<meta name="dc.subject" xml:lang="en" content="Modeling" />
+<meta name="dc.subject" xml:lang="en" content="Chinese Fir" />
+<meta name="dc.subject" xml:lang="en" content="Standing volume table" />
+<!-- 循环输出作者 -->
+<meta name="dc.creator" content="林辉" />
+<meta name="dc.creator" xml:lang="en" content="Lin Hui" />
+<meta name="dc.creator" content="宁晓波" />
+<meta name="dc.creator" xml:lang="en" content="Ning Xiaobo" />
+<meta name="dc.creator" content="吕勇" />
+<meta name="dc.creator" xml:lang="en" content="Lü Yong" />
+<!-- 发布日期 -->
+<meta name="dc.date" content="2004-07-25" />
+<!-- doi -->
+<meta name="dc.identifier" content="" />
+<!-- 出版社 -->
+<meta name="dc.publisher" content="林业科学" />
+<meta name="dc.publisher" xml:lang="en" content="Scientia Silvae Sinicae" />
+<!-- licenses default -->
+<meta name="dc.rights" content="http://creativecommons.org/licenses/by/3.0/"/>
+<script type="text/javascript" src="js/html_new.js"></script>
+<script type="text/javascript" src="js/global-min_new.js"></script>
+
+<title>基于高分辨率卫星图像的立木材积表的编制</title>
+<meta name="keywords" content=" QuickBird卫星图像,  建模,  杉木,  立木材积表 " />
+<meta name="keywords" content=" QuickBird satellite image,  Modeling,  Chinese Fir,  Standing volume table " />
+
+<script type="text/javascript">
+	$(function(){
+		var width = $(window).width()
+		if(width == "1920"){
+			$(".shiying").width(1728);
+			}else{
+			$(".shiying").width(1280);	
+				}
+		})
+</script>
+
+</head>
+<body  LEFTMARGIN=0 TOPMARGIN=0 MARGINWIDTH=0 MARGINHEIGHT=0>
+<div style="width:1280px; margin:0 auto; background-color:#0066cc;" class="shiying">
+<table width="1280" border="0" cellspacing="0" cellpadding="0" align="center" bgcolor="#fff">
+ <tr >
+    <td style="cursor: pointer; background:#0066cc;" colspan=2 class="td1" ><IFRAME id="Top"  border=0 src="top.html" width=1280 scrolling=no frameborder=0></IFRAME></td>
+  </tr>
+ </table> 
+ </div> 
+<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center" bgcolor=#FFFFFF>
+ 
+  <tr >
+    <td height="26" width=70% align="left" class="td" style="border-left:1px solid #CCCCCE;">&nbsp;&nbsp;<a target="_blank" href="http://www.linyekexue.net">林业科学</a>&nbsp;<img src="images/dao.gif"/>&nbsp;2004, Vol. 40<img src="images/dao.gif"/> Issue (4): 33-39 <img src="http://www.rhhz.net/HTML/click/readHtml.asp?Journal=LiYeKeXue&FileNo=20040406" width=0 height=0 border=0></td>
+    <td align="right" width=30% class="td" valign=middle style="border-right:1px solid #CCCCCE;"><img src="images/pdf-icon.jpg" border=0>&nbsp;&nbsp;<a href="http://www.linyekexue.net/CN/article/downloadArticleFile.do?attachType=PDF&id=4771">PDF</a>&nbsp;&nbsp;&nbsp;&nbsp; </td>
+  </tr>
+</table>
+
+<body>
+<div class="rich_html_content">
+  <div id="leftPaneInner">
+    <div id="leftPanelTable">
+      <div class="outline_td">
+        <div class="nav-col" >
+          <div class="nav" id="nav-article-page" > </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="main_article_body">
+   
+		<div class="outline_switch_td"></div>
+		<div id="pagebdy">
+        	<div class="cf" id="article-block">	       
+          		<div class="header" id="hdr-article" >
+		  	  		<div class="article-kicker"></div>		
+		 	    </div>				
+        <div id="haha" >     
+		<div id="youce">
+        <div id="youcetop">
+          <div id="youcetopneirong">
+                       
+
+            <div class="bshare-custom">
+              <a title="分享到微信" class="bshare-weixin"></a><a title="分享到QQ空间" class="bshare-qzone"></a><a title="分享到新浪微博" class="bshare-sinaminiblog"></a><a title="分享到人人网" class="bshare-renren"></a><a title="分享到腾讯微博" class="bshare-qqmb"></a><a title="分享到网易微博" class="bshare-neteasemb"></a><a title="更多平台" class="bshare-more bshare-more-icon more-style-addthis"></a><span class="BSHARE_COUNT bshare-share-count">0</span>
+            </div><script type="text/javascript" charset="utf-8" src="#style=-1&amp;uuid=&amp;pophcol=2&amp;lang=zh">
+</script><script type="text/javascript" charset="utf-8" src="http://static.bshare.cn/b/bshareC0.js">
+</script>
+<script>
+	bShare.addEntry({
+	    title:"林业科学",
+	    summary:" 基于高分辨率卫星图像的立木材积表的编制",
+	    vUid:'' , vEmail:'', vTag:'BSHARE'});
+
+</script>
+          </div>
+        </div>
+
+        <div id="youcebottom">
+          <h4>文章信息</h4>
+
+          <div id="bibliographicdiv" class="gongzuoquyue" kaiguan="1">
+            <dl class="citation">
+              <dd>
+林辉, 宁晓波, 吕勇.               </dd>
+
+              <dd>
+Lin Hui, Ning Xiaobo, Lü Yong.               </dd>
+
+              <dd class="title">基于高分辨率卫星图像的立木材积表的编制</dd>
+
+              <dd class="title">Compiling the Standing Volume Table of Chinese Fir Based on the High-Resolution Satellite Image</dd>
+
+              <dd class="pubInfo">林业科学, 2004, 40(4): 33-39.</dd>
+              
+              <dd class="pubInfo">Scientia Silvae Sinicae, 2004, 40(4): 33-39.</dd>
+
+                          </dl>
+
+            <dl class="articleHistory">
+              <dd>
+                <h3>文章历史</h3>
+              </dd>
+				              <dd>收稿日期：2003-12-04</dd>
+								            
+            </dl>
+			
+			<dl class="articleHistory">
+              <dd>
+                <h3>作者相关文章</h3>
+              </dd>
+<dd><span class="author">林辉</span></dd><dd><span class="author">宁晓波</span></dd><dd><span class="author">吕勇</span></dd>            </dl>
+             <div>
+             	<h4 style="background:none;"></h4>
+                <div id="workspacediv" class="gongzuoquyue" kaiguan="0">
+                    <div id="wordsneirong"></div>
+                </div>
+             </div>
+          </div>
+
+         
+
+         
+        </div>
+      </div>
+			<div id="hahacontentyouce">
+            <div class="article_meta_info">		
+			 	<span class="abs_title outline_anchor" level="0"></span>
+			<div>引用本文<img src="images/to.jpg"/></div>
+			<div class="yinyongbenwen" id="copy_CN">
+林辉, 宁晓波, 吕勇. 2004. 基于高分辨率卫星图像的立木材积表的编制. 林业科学, 40(4): 33-39.
+<a id="d_clip_button_CN" href="javascript:void(0);"><img  class="copy_btn" title="复制到剪切板"  src="images/copy.gif" /></a>
+</div>
+
+          <div class="yinyongbenwen" id="copy_EN">
+Lin Hui, Ning Xiaobo, Lü Yong. 2004. Compiling the Standing Volume Table of Chinese Fir Based on the High-Resolution Satellite Image. Scientia Silvae Sinicae, 40(4): 33-39.&nbsp;&nbsp;<a id="d_clip_button_EN" href="javascript:void(0);"><img  class="copy_btn" title="复制到剪切板"  src="images/copy.gif" /></a>
+</div>
+        </div>
+
+        <div class="line"></div>
+
+        <div class="article_title_cn">
+          基于高分辨率卫星图像的立木材积表的编制
+        </div>
+<!-- 中文作者 -->
+    <div class="author_name_list">
+                    <span class="author_CN" id="zuozhe1_CN">
+林辉<sup>1</sup></span>,                                 <span class="author_CN" id="zuozhe2_CN">
+宁晓波<sup>2</sup></span>,                                 <span class="author_CN" id="zuozhe3_CN">
+吕勇<sup>1</sup></span>                        &nbsp;&nbsp;&nbsp;&nbsp;<a class="layout_arrows to_down"></a>
+</div>
+    		
+        <div class="layout_arrows_content">
+          <div class="affiliation_list">
+            <div>
+            	                                  <span class="danwei1_CN">
+                                                                     1.
+                                          中南林学院资源与环境学院 株洲 412006</span>;<br>                                  <span class="danwei2_CN">
+                                                                     2.
+                                          贵州省林业勘察设计院 贵阳 550003</span>                           </div>
+          </div>
+
+          <div class="article_meta_other">
+			<!--以下的三个日期，如果excle里面没有，那就去pdf里面找--->
+            <div class="receivedate">
+            收稿日期：2003-12-04             </div>
+			            <div class="fund">
+	              	基金项目：国土资源部863项目“重大行业3S应用示范 (2002AA134070) ”，湖南省杰出中青年专家科技专项计划资助项目 (02JJYB005) 和株洲市国土局数字国土项目“土地利用遥感技术体系研究”
+	        </div>
+			
+
+
+          </div>
+        </div>
+ 
+<!-- 中文摘要 -->
+    <span class="outline_anchor" level="Zhai_CN"></span>
+<div class="abs" style="MARGIN-TOP: 10px">
+<b>摘要：</b> 以QuickBird卫星图像和杉木为研究对象，在对图像进行精处理的基础上，通过在图像上测定出杉木冠幅，建立了胸径和冠幅的一元回归模型：<i>D</i><sub>1.3</sub>=2.221+4.393<i>C</i><sub>k</sub>，由不同冠幅值计算出的胸径查一元材积表，据此编制出一元卫星图像立木材积表；根据图像上测算出树高和冠幅，建立了二元回归模型：<i>V</i>=-0.246 05+0.013 806<i>C</i><sub>k</sub>+0.035 263 <i>H</i>，据此编制出了卫星图像二元立木材积表。杉木在图像上的高是通过建立杉木树高与胸径关系模型：<img src="PIC/lykx-40-4-33-M1.jpg"/>测算得来。</div><!-- 中文关键词 -->
+<span class="outline_anchor" level="Guan_CN"></span>
+<div class="key"><span class="key_title outline_anchor1">关键词：</span>
+<span class="keyword">QuickBird卫星图像</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">建模</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">杉木</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">立木材积表</span>&nbsp;&nbsp;&nbsp;&nbsp;</div>
+
+		<!--===英文=======-->
+        <div class="article_title_cn">
+        	Compiling the Standing Volume Table of Chinese Fir Based on the High-Resolution Satellite Image
+        </div>
+
+<!-- 英文作者 -->
+                                                <div class="author_name_list">
+                    <span class="author_EN" id="zuozhe1_EN">
+Lin Hui<sup>1</sup></span>,                                 <span class="author_EN" id="zuozhe2_EN">
+Ning Xiaobo<sup>2</sup></span>,                                 <span class="author_EN" id="zuozhe3_EN">
+Lü Yong<sup>1</sup></span>                        &nbsp;&nbsp;&nbsp;&nbsp;<a class="layout_arrows to_down"></a>
+</div>
+    
+
+<div class="layout_arrows_content">
+
+                                            <div class="affiliation_list"><div>
+            <span class="danwei1_EN">
+                    1.         The Faculty of Resources and Environment, Central South Forestry University Zhuzhou 412006</span>;<br/>                <span class="danwei2_EN">
+                    2.         Guizhou Forest Survey and Design Intitute Guiyang 550003</span>    </div></div>
+    <div class="article_meta_other">
+
+
+
+
+
+
+    </div>
+</div>
+
+
+<!-- 英文摘要 -->
+    <span class="outline_anchor" level="Zhai_EN"></span>
+<div class="abs" style="MARGIN-TOP: 10px">
+<b>Abstract</b>: This paper focused on how to compile volume table of Chinese Fir according to High-resolution QuickBird image, the method is the following:The crown width of fir was measured on the intensive processed QuickBird image, and single element regression model of crown width—height of breast was built: <i>D</i><sub>1.3</sub>=2.221+4.393<i>C</i><sub>k</sub>, volume of each fir tree can be looked up in the single element volume table according to different value of <i>D</i><sub>1.3</sub> in different crown width, so mono-factor volume table can be compiled. Binary regression equation, <i>V</i>=-0.246 05+0.013 806<i>C</i><sub>k</sub>+0.035 263 <i>H</i>, was modeled according to height and crown breadth measured on the image. The height of thee on the image can be gained by the following model:<img src="PIC/lykx-40-4-33-M1.jpg"/>.Dual-factor volume table was then compiled.</div><!-- 英文关键词 -->
+<span class="outline_anchor" level="Guan_EN"></span>
+<div class="key"><span class="key_title outline_anchor1">Key words</span>: 
+<span class="keyword">QuickBird satellite image</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">Modeling</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">Chinese Fir</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">Standing volume table</span>&nbsp;&nbsp;&nbsp;&nbsp;</div>
+
+<!--===正文======-->
+
+
+<div class="article_body">
+ 																																								<p class="Ident-First-Line">利用遥感技术测算森林资源一直是林业工作者不断探索和实践的内容，过去林业上卫星遥感应用的信息源主要是TM，利用这种图像测算蓄积量一直是很多学者研究的内容，这种图像上很难测定出蓄积量相关的测树因子，只能采用大量的间接因子建立数学模型对林分的蓄积量进行估测 (<span class="xref"><a href="#b赵宪文2001" ref-type="bibr">赵宪文等，2001</a></span>；<span class="xref"><a href="#b侯长谋2000" ref-type="bibr">侯长谋等，2000</a></span>) 。20世纪80年代林业遥感曾探讨过利用航空像片编制航空像片材积表，如利用比例尺为1:10 000的航空像片编制航空像片立木材积表，利用1:25 000的航空像片编制航空像片林分材积表，像片比例尺越大，材积表的精度也越高 (<span class="xref"><a href="#b林辉2002" ref-type="bibr">林辉等，2002</a></span>；<span class="xref"><a href="#b欧润贵1989" ref-type="bibr">欧润贵，1989</a></span>) 。至少比同一时期利用卫星图像测算蓄积量的精度要高，但由于编制这种材积表的成本太高，实际上航空像片材积表并未编制出来。随着遥感技术的飞速发展，遥感图像的分辨率有了大幅度提高，如QuickBird卫星图像的空间分辨率现已高达0.61 m，现代高分辨率的卫星图像实际上已超过了许多航空像片的分辨率，如比例尺为1:10 000的航空像片的分辨率大约为2 m左右，而0.61 m分辨率的QuickBird图像大约相于比例尺在1:5 000左右的航空像片，随着卫星图像分辨率进一步提高，如IKONOS计划在2004年发射分辨率为0.27 m的卫星，遥感图像上不仅能显示出大的地形地貌，还能清楚地反映出地物的细部特征，在这种图像上进行小斑区划和面积求算可以高精度地满足生产要求，但蓄积量的测算仍不理想。编制卫星图像材积表的条件已趋成熟。</p>
+																																																						<span class="paragraph_title outline_anchor" level=1>1 研究区情况介绍</span>
+																																								<p class="Ident-First-Line">本研究区位于株洲市河西地区，总面积160 km<sup>2</sup>。研究区内森林覆盖率比较高，以杉木 ( <i>Cunninghamia lanceolata</i>) 和马尾松 (<i>Pinus massioniana</i>) 人工林为主。地形平坦，起伏不大，相对高差不足50 m。</p>
+																																																						<span class="paragraph_title outline_anchor" level=1>2 QuickBird数据预处理</span>
+																																			<span class="paragraph_title outline_anchor" level=2>2.1 数据质量分析</span>
+																																								<p class="Ident-First-Line">本次购买的遥感数据覆盖了株洲市河西地区，地形平坦，最大高差不足50 m，最高建筑物为株洲电视塔，高度为365 m。数据接收时间为2002年4月1日，Geo tiff格式，无云，数据质量较好。</p>
+																																																						<span class="paragraph_title outline_anchor" level=2>2.2 QuickBird图像颜色处理</span>
+																																								<p class="Ident-First-Line">彩色处理是遥感图像处理的重要环节，QuickBird数据共有4个单波段和1个全波段，这些波段合成后的图像一般与地面真实颜色不相符，即通常所称的假彩色图像。假彩色的配色方式可以是多种多样的，如以QuickBird4个波段中的3个波段为一组，分别配以红、绿、蓝3种颜色，共有24种配色方案。再加上对各波段分别进行的增强，波段间的运算处理，组合更多 (<span class="xref"><a href="#b宁小年1995" ref-type="bibr">宁小年等，1995</a></span>；<span class="xref"><a href="#b孙家抦1997" ref-type="bibr">孙家抦等，1997</a></span>；<span class="xref"><a href="#b章孝灿1997" ref-type="bibr">章孝灿等，1997</a></span>) 。</p>
+																																																											<p class="Ident-First-Line">假彩色图像在遥感中相当普遍，但对QuickBird高分辨率图像来说，最好能实现真彩色，这样更有利于判读。经过试验发现，采用ER MAPPER软件对遥感数据进行融合，反差增强和比值处理后，图像不仅分辨率高，颜色也接近于真彩色。其处理过程为：将源数据读入后，采用RGB算法，在红、绿、蓝3个通道分别付给3、2、1波段的数据，增加一个绿色层，付给第2波段和第4波段数据的平均值；再增加上一个intensity层，付给全波段数据，各层分别反差增加，然后将这5层数据进行融合，处理后的图像效果较好。</p>
+																																																						<span class="paragraph_title outline_anchor" level=2>2.3 GPS测定地面控制点 (GCP) </span>
+																																								<p class="Ident-First-Line">由于QuickBird图像的空间分辨率较高，常用的1:10 000地形图不能满足其作为控制点的精度要求，1:500地形图比较合适，但现有的1:500地形图数据非常有限，不能覆盖全部研究区，为了保证GCP的精度，本次采用了GPS实测地面控制点的方法。</p>
+																																																						<span class="paragraph_title outline_anchor" level=3>2.3.1 布设地面控制点</span>
+																																								<p class="Ident-First-Line">在图像上均匀布设了13个控制点，由于图像分辨率较高，为使野外定位精度更高，交叉路口、道路河流的拐弯点均不能用作控制点，本次控制点大多选择在宽度在0.5 m左右的细小田埂和小道的交叉处，野外定位更准确。采用天宝公司静态GPS对每个控制点进行实测，另选取3个国家三级控制点作为已知点参与外业测量和内业解算。</p>
+																																																						<span class="paragraph_title outline_anchor" level=3>2.3.2 GPS数据接收及处理</span>
+																																								<p class="Ident-First-Line">外业测定的GPS数据经天宝公司软件Trimble Geomatics Office导入到系统内，经平差后各点坐标在单方向上的最大误差为1.9 cm，最小误差为0.5 cm，精度较高，可以作为对QuickBird图像进行几何校正的控制点。</p>
+																																																						<span class="paragraph_title outline_anchor" level=2>2.4 QuickBird图像几何精校正</span>
+																																			<span class="paragraph_title outline_anchor" level=3>2.4.1 二次多项式法几何校正</span>
+																																								<p class="Ident-First-Line">利用遥感图像处理软件ERMAPPER6.2对QuickBird图像进行二次多项式法几何校正，校正时每个控制点的均方根误差均控制在1个像元以内，以保证纠正后的图像具有较高的精度。当某个控制点的累积误差较大时，应作适当调整，以分散其误差。</p>
+																																																						<span class="paragraph_title outline_anchor" level=3>2.4.2 平面点位精度分析</span>
+																																								<p class="Ident-First-Line">将纠正后的图像同1:500地形图叠加，其匹配效果非常好。进一步在遥感图像上均匀选取了19个点，并同1:500地形图上相应点的坐标进行比较，计算点位误差，结果点位误差均小于1 m，若换算成像元，点位误差在1个像元左右，说明纠正后的图像具有较高的精度，见<span class="xref"><a href="#Table1" ref-type="table">表 1</a></span>。</p>
+																																																																<div class="table outline_anchor" >
+									<div class="textboxdefault" id=Table1>
+										<div class="biaotineirong"> 
+											<span class="caption"><span  class="TabText" id='Table1'>表 1</span> 点位误差分析</span>
+																						<span class="caption">
+												<span  class="TabText" id=Table1>Tab.1</span>
+												 Errors of Check Points
+											</span>
+																					</div>
+										<div class="biaogeneirong">
+											<div class="neiqianTable">
+												<table>		
+												<tbody>
+												   <tr>
+									                  <td>
+									                   <img class="table-icon"  title="Click to view table content" src="images/table-icon.gif"/>
+									                   <div class="table_content" style="display: none;">
+									                        <p class="caption" style="text-align:center">
+									                            <span id="Table1" class="TabText">表 1</span> 点位误差分析   
+									                        </p>
+									                        									                        <p class="caption" style="text-align:center">
+									                            <span id="Table1" class="TabText">Tab.1</span>
+									                             Errors of Check Points
+									                         </p>
+									                         									                      <div style="text-align:left;">
+									                  	<table>
+<tbody>
+        <tr><td>
+            <img src="PIC/lykx-40-4-33-T1.jpg"></img>
+        </td></tr></tbody>
+</table>
+									                      </div>
+									                   </div>
+									                 </td>
+									               </tr>
+												</tbody>
+											</table>
+												
+											</div>
+										</div>
+										<div class="biaogeanniu">
+									      <div class="figdownload"></div>
+									    </div>
+									</div>
+								</div>
+																																<span class="paragraph_title outline_anchor" level=1>3 QuickBird图像上单株杉木冠幅的测定</span>
+																																								<p class="Ident-First-Line">为了准确测定出QuickBird图像上单株树木的冠幅，首先在城区进行了预试验 (见<span class="xref"><a href="#Figure1" ref-type="fig">图 1</a></span>) 。在图像上对每株树木 (樟木，<i>Cinnamomum camphora</i>) 进行标记，采用ER MAPPER软件测定出每株樟树的冠幅大小，冠幅取南北和东西两个方向的平均值，然后通过地面定位后，实测冠幅，结果如<span class="xref"><a href="#Table2" ref-type="table">表 2</a></span>。全部单株树木冠幅平均相差0.31 m，相对误差为5%，说明利用卫星图像可以准确测出单株树木的冠幅。</p>
+																																																	        							<div class="figure outline_anchor">
+								<div class="textboxdefault">
+									<table id="Figure1" border=0>
+										<tr>
+											<td align="center" valign="middle" class="figcontent">
+												<img src="PIC/lykx-40-4-33-1.jpg" title="点击查看原图" width=200 original="PIC/lykx-40-4-33-1.jpg"/>
+											</td>
+											<td align="left" valign="middle">
+                                                        <span class="caption"><span class="FigText" id="Figure1">图 1</span> QuickBird图像上的单株樟木</span>                                                        <span class="caption"><span class="FigText" id="Figure1">Fig. 1</span> Camphor tree (<i>Cinnamomum camphora</i>) on the QuickBird Image</span>                                                                                                                                        </td>
+										</tr>
+									</table>
+								</div>
+							</div> 
+																																																	<div class="table outline_anchor" >
+									<div class="textboxdefault" id=Table2>
+										<div class="biaotineirong"> 
+											<span class="caption"><span  class="TabText" id='Table2'>表 2</span> 地面实测单株冠幅同QuickBird图像上测定值比较</span>
+																						<span class="caption">
+												<span  class="TabText" id=Table2>Tab.2</span>
+												 Crown width of camphor tree (<i>Cinnamomum camphora</i>) on the ground and on the image respectively
+											</span>
+																					</div>
+										<div class="biaogeneirong">
+											<div class="neiqianTable">
+												<table>		
+												<tbody>
+												   <tr>
+									                  <td>
+									                   <img class="table-icon"  title="Click to view table content" src="images/table-icon.gif"/>
+									                   <div class="table_content" style="display: none;">
+									                        <p class="caption" style="text-align:center">
+									                            <span id="Table1" class="TabText">表 2</span> 地面实测单株冠幅同QuickBird图像上测定值比较   
+									                        </p>
+									                        									                        <p class="caption" style="text-align:center">
+									                            <span id="Table1" class="TabText">Tab.2</span>
+									                             Crown width of camphor tree (<i>Cinnamomum camphora</i>) on the ground and on the image respectively
+									                         </p>
+									                         									                      <div style="text-align:left;">
+									                  	<table>
+<tbody>
+        <tr><td>
+            <img src="PIC/lykx-40-4-33-T2.jpg"></img>
+        </td></tr></tbody>
+</table>
+									                      </div>
+									                   </div>
+									                 </td>
+									               </tr>
+												</tbody>
+											</table>
+												
+											</div>
+										</div>
+										<div class="biaogeanniu">
+									      <div class="figdownload"></div>
+									    </div>
+									</div>
+								</div>
+																																<span class="paragraph_title outline_anchor" level=1>4 单株杉木冠幅的测定</span>
+																														        							<div class="figure outline_anchor">
+								<div class="textboxdefault">
+									<table id="Figure2" border=0>
+										<tr>
+											<td align="center" valign="middle" class="figcontent">
+												<img src="PIC/lykx-40-4-33-2.jpg" title="点击查看原图" width=200 original="PIC/lykx-40-4-33-2.jpg"/>
+											</td>
+											<td align="left" valign="middle">
+                                                        <span class="caption"><span class="FigText" id="Figure2">图 2</span> 在QuickBird图像上的18号杉木</span>                                                        <span class="caption"><span class="FigText" id="Figure2">Fig. 2</span> Chinese Fir 18 on the QuickBrid image</span>                                                                                                                                        </td>
+										</tr>
+									</table>
+								</div>
+							</div> 
+																																		        							<div class="figure outline_anchor">
+								<div class="textboxdefault">
+									<table id="Figure3" border=0>
+										<tr>
+											<td align="center" valign="middle" class="figcontent">
+												<img src="PIC/lykx-40-4-33-3.jpg" title="点击查看原图" width=200 original="PIC/lykx-40-4-33-3.jpg"/>
+											</td>
+											<td align="left" valign="middle">
+                                                        <span class="caption"><span class="FigText" id="Figure3">图 3</span> 地面实拍的18号杉木</span>                                                        <span class="caption"><span class="FigText" id="Figure3">Fig. 3</span> Chinese Fir 18 on the ground</span>                                                                                                                                        </td>
+										</tr>
+									</table>
+								</div>
+							</div> 
+																																												<p class="Ident-First-Line">按照以上方法，以杉木为研究对象，在图像上确定适合的杉木并进行编号，野外对每棵树进行定位，拍照，实测胸径，树高和冠幅。</p>
+																																																											<p class="Ident-First-Line">由于树木在图像上处于不同的地理位置，测定时有的树木会产生较大的偏差，有的树木在某个方向上有较大偏差，对不合理的数据予以舍去。在林区测定的树木冠幅相对误差比城区稍大，结果见<span class="xref"><a href="#Table3" ref-type="table">表 3</a></span>。</p>
+																																																																<div class="table outline_anchor" >
+									<div class="textboxdefault" id=Table3>
+										<div class="biaotineirong"> 
+											<span class="caption"><span  class="TabText" id='Table3'>表 3</span> 在QuickBird图像上和地面分别测定的杉木冠幅值</span>
+																						<span class="caption">
+												<span  class="TabText" id=Table3>Tab.3</span>
+												 Crown width of Chinese Fir on the ground and on the image respectively
+											</span>
+																					</div>
+										<div class="biaogeneirong">
+											<div class="neiqianTable">
+												<table>		
+												<tbody>
+												   <tr>
+									                  <td>
+									                   <img class="table-icon"  title="Click to view table content" src="images/table-icon.gif"/>
+									                   <div class="table_content" style="display: none;">
+									                        <p class="caption" style="text-align:center">
+									                            <span id="Table1" class="TabText">表 3</span> 在QuickBird图像上和地面分别测定的杉木冠幅值   
+									                        </p>
+									                        									                        <p class="caption" style="text-align:center">
+									                            <span id="Table1" class="TabText">Tab.3</span>
+									                             Crown width of Chinese Fir on the ground and on the image respectively
+									                         </p>
+									                         									                      <div style="text-align:left;">
+									                  	<table>
+<tbody>
+        <tr><td>
+            <img src="PIC/lykx-40-4-33-T3.jpg"></img>
+        </td></tr></tbody>
+</table>
+									                      </div>
+									                   </div>
+									                 </td>
+									               </tr>
+												</tbody>
+											</table>
+												
+											</div>
+										</div>
+										<div class="biaogeanniu">
+									      <div class="figdownload"></div>
+									    </div>
+									</div>
+								</div>
+																																<span class="paragraph_title outline_anchor" level=1>5 卫星图像材积表的编制</span>
+																																			<span class="paragraph_title outline_anchor" level=2>5.1 建立胸径一冠幅模型</span>
+																																								<p class="Ident-First-Line">在QuickBird图像上，胸径是不能直接测定出来，但冠幅却很容易测定，根据树冠冠幅与胸径线性相关这一原理 (<span class="xref"><a href="#b成子纯1990" ref-type="bibr">成子纯，1990</a></span>; <span class="xref"><a href="#b孟宪宇1999" ref-type="bibr">孟宪宇，1999</a></span>) ，可建立树冠冠幅与胸径的关系模型：</p>
+																																																										<table-wrap>
+									<table style="width:100%;">
+										<tr>
+											<td align="center">
+												<img src="PIC/lykx-40-4-33-E1.jpg"></img>
+											</td>
+											<td style="width:20px;"> (1) </td>										</tr>
+									</table>
+								</table-wrap> 
+																																																											<p class="Ident-First-Line"><i>D</i><sub>1.3</sub>：胸径；<i>C</i><sub>k</sub>：图像上测定冠幅值</p>
+																																																											<p class="Ident-First-Line">根据<span class="xref"><a href="#Table2" ref-type="table">表 2</a></span>中实测的胸径和冠幅进行一元回归，a，b值分别为2.220 9，4.392 8，则有：</p>
+																																																										<table-wrap>
+									<table style="width:100%;">
+										<tr>
+											<td align="center">
+												<img src="PIC/lykx-40-4-33-E2.jpg"></img>
+											</td>
+											<td style="width:20px;"> (2) </td>										</tr>
+									</table>
+								</table-wrap> 
+																																																						<span class="paragraph_title outline_anchor" level=2>5.2 一元卫星图像立木材积表的编制</span>
+																																								<p class="Ident-First-Line">根据式 (2) 可求出不同冠幅值对应的胸径值，由胸径值查一元材积表，得出单株材积，依冠幅值的不同把材积排列成表，即得出杉木的一元卫星图像立木材积表，结果见<span class="xref"><a href="#Table4" ref-type="table">表 4</a></span>。</p>
+																																																																<div class="table outline_anchor" >
+									<div class="textboxdefault" id=Table4>
+										<div class="biaotineirong"> 
+											<span class="caption"><span  class="TabText" id='Table4'>表 4</span> 一元卫星图像立木材积表</span>
+																						<span class="caption">
+												<span  class="TabText" id=Table4>Tab.4</span>
+												 Compiled mono-element volume table of Chinese Fir
+											</span>
+																					</div>
+										<div class="biaogeneirong">
+											<div class="neiqianTable">
+												<table>		
+												<tbody>
+												   <tr>
+									                  <td>
+									                   <img class="table-icon"  title="Click to view table content" src="images/table-icon.gif"/>
+									                   <div class="table_content" style="display: none;">
+									                        <p class="caption" style="text-align:center">
+									                            <span id="Table1" class="TabText">表 4</span> 一元卫星图像立木材积表   
+									                        </p>
+									                        									                        <p class="caption" style="text-align:center">
+									                            <span id="Table1" class="TabText">Tab.4</span>
+									                             Compiled mono-element volume table of Chinese Fir
+									                         </p>
+									                         									                      <div style="text-align:left;">
+									                  	<table>
+<tbody>
+        <tr><td>
+            <img src="PIC/lykx-40-4-33-T4.jpg"></img>
+        </td></tr></tbody>
+</table>
+									                      </div>
+									                   </div>
+									                 </td>
+									               </tr>
+												</tbody>
+											</table>
+												
+											</div>
+										</div>
+										<div class="biaogeanniu">
+									      <div class="figdownload"></div>
+									    </div>
+									</div>
+								</div>
+																																					<p class="Ident-First-Line">对于分布比较均匀的林分，如人工林，还可在图像上测算出林分的密度，由上表查出的单株材积，大致推算出林分蓄积量，但这种方法并不适用于所有林分。</p>
+																																																						<span class="paragraph_title outline_anchor" level=2>5.3 二元卫星图像立木材积表的编制</span>
+																																								<p class="Ident-First-Line">二元卫星图像立木材积表的编制比较复杂，是根据树高和树冠与材积密切相关原理，用像片上测定冠幅及测算的树高同地面实测材积建立回归关系进行编制的，常用的回归方程有很多，本次选用的方程为:</p>
+																																																										<table-wrap>
+									<table style="width:100%;">
+										<tr>
+											<td align="center">
+												<img src="PIC/lykx-40-4-33-E3.jpg"></img>
+											</td>
+											<td style="width:20px;"> (3) </td>										</tr>
+									</table>
+								</table-wrap> 
+																																																											<p class="Ident-First-Line"><i>V</i>:地面实测单株材积; <i>H</i>：图像上测算的树高；<i>C</i><sub>k</sub>:图像上测定冠幅; a<sub>0</sub>、a<sub>1</sub>、a<sub>2</sub>：参数。</p>
+																																																											<p class="Ident-First-Line">目前在图像上测树高精度不高，根据树高与胸径高度相关这一原理，暂采用树高—胸径模型的办法测算出树高。杉木树高与胸径的关系模型较多，中南林学院森林经理教研室对研究区所在地的杉木进行标准地每木解析，建立了4种关系模型，其中相关系数最大而标准差最小的模型为 (<span class="xref"><a href="#b成子纯1990" ref-type="bibr">成子纯，1990</a></span>) ：</p>
+																																																										<table-wrap>
+									<table style="width:100%;">
+										<tr>
+											<td align="center">
+												<img src="PIC/lykx-40-4-33-E4.jpg"></img>
+											</td>
+											<td style="width:20px;"> (4) </td>										</tr>
+									</table>
+								</table-wrap> 
+																																																											<p class="Ident-First-Line">根据<span class="xref"><a href="#Table3" ref-type="table">表 3</a></span>实测的胸径和树高，可求出常数a，b的值分别为：0.215，1.746，相关系数为0. 8，式 (3) 即为：</p>
+																																																										<table-wrap>
+									<table style="width:100%;">
+										<tr>
+											<td align="center">
+												<img src="PIC/lykx-40-4-33-E5.jpg"></img>
+											</td>
+											<td style="width:20px;"> (5) </td>										</tr>
+									</table>
+								</table-wrap> 
+																																																											<p class="Ident-First-Line">由式 (4) 测算出不同胸径下的树高值，由<span class="xref"><a href="#Table2" ref-type="table">表 2</a></span>整理出径阶—树高值，并查二元材积表，得出地面实测单株材积，整理出<span class="xref"><a href="#Table5" ref-type="table">表 5</a></span>。</p>
+																																																																<div class="table outline_anchor" >
+									<div class="textboxdefault" id=Table5>
+										<div class="biaotineirong"> 
+											<span class="caption"><span  class="TabText" id='Table5'>表 5</span> 杉木单株材积、图像上测定冠幅和测算树高值</span>
+																						<span class="caption">
+												<span  class="TabText" id=Table5>Tab.5</span>
+												 Volume, crown width and height of Chinese Fir
+											</span>
+																					</div>
+										<div class="biaogeneirong">
+											<div class="neiqianTable">
+												<table>		
+												<tbody>
+												   <tr>
+									                  <td>
+									                   <img class="table-icon"  title="Click to view table content" src="images/table-icon.gif"/>
+									                   <div class="table_content" style="display: none;">
+									                        <p class="caption" style="text-align:center">
+									                            <span id="Table1" class="TabText">表 5</span> 杉木单株材积、图像上测定冠幅和测算树高值   
+									                        </p>
+									                        									                        <p class="caption" style="text-align:center">
+									                            <span id="Table1" class="TabText">Tab.5</span>
+									                             Volume, crown width and height of Chinese Fir
+									                         </p>
+									                         									                      <div style="text-align:left;">
+									                  	<table>
+<tbody>
+        <tr><td>
+            <img src="PIC/lykx-40-4-33-T5.jpg"></img>
+        </td></tr></tbody>
+</table>
+									                      </div>
+									                   </div>
+									                 </td>
+									               </tr>
+												</tbody>
+											</table>
+												
+											</div>
+										</div>
+										<div class="biaogeanniu">
+									      <div class="figdownload"></div>
+									    </div>
+									</div>
+								</div>
+																																					<p class="Ident-First-Line">根据<span class="xref"><a href="#Table5" ref-type="table">表 5</a></span>中的数值，采用最小二乘法求出参数a<sub>0</sub>、a<sub>1</sub>和a<sub>2</sub>的值分别为：-0.246 05，0.013 806，0.035 263，方程 (3) 可变为：</p>
+																																																										<table-wrap>
+									<table style="width:100%;">
+										<tr>
+											<td align="center">
+												<img src="PIC/lykx-40-4-33-E6.jpg"></img>
+											</td>
+											<td style="width:20px;"> (6) </td>										</tr>
+									</table>
+								</table-wrap> 
+																																																											<p class="Ident-First-Line">将<i>C</i><sub>k</sub>和<i>H</i>不同值代入方程即可求出单株材积。按树高和冠幅大小，将材积排列成表即得二元卫星图像材积表，如下<span class="xref"><a href="#Table6" ref-type="table">表 6</a></span>。</p>
+																																																																<div class="table outline_anchor" >
+									<div class="textboxdefault" id=Table6>
+										<div class="biaotineirong"> 
+											<span class="caption"><span  class="TabText" id='Table6'>表 6</span> 杉木二元卫星图像立木材积表</span>
+																						<span class="caption">
+												<span  class="TabText" id=Table6>Tab.6</span>
+												 Compiled dual-element volume table of Chinese Fir
+											</span>
+																					</div>
+										<div class="biaogeneirong">
+											<div class="neiqianTable">
+												<table>		
+												<tbody>
+												   <tr>
+									                  <td>
+									                   <img class="table-icon"  title="Click to view table content" src="images/table-icon.gif"/>
+									                   <div class="table_content" style="display: none;">
+									                        <p class="caption" style="text-align:center">
+									                            <span id="Table1" class="TabText">表 6</span> 杉木二元卫星图像立木材积表   
+									                        </p>
+									                        									                        <p class="caption" style="text-align:center">
+									                            <span id="Table1" class="TabText">Tab.6</span>
+									                             Compiled dual-element volume table of Chinese Fir
+									                         </p>
+									                         									                      <div style="text-align:left;">
+									                  	<table>
+<tbody>
+        <tr><td>
+            <img src="PIC/lykx-40-4-33-T6.jpg"></img>
+        </td></tr></tbody>
+</table>
+									                      </div>
+									                   </div>
+									                 </td>
+									               </tr>
+												</tbody>
+											</table>
+												
+											</div>
+										</div>
+										<div class="biaogeanniu">
+									      <div class="figdownload"></div>
+									    </div>
+									</div>
+								</div>
+																																<span class="paragraph_title outline_anchor" level=1>6 结果与讨论</span>
+																																								<p class="Ident-First-Line">在QuickBird图像上测定单株树木的冠幅有严格的限制，孤立木、散生木的测定精度较高，这就使得试验区内合适的样本非常有限；对于冠幅太小的单株树木或郁闭后林分的测定精度较低。孤立木和散生木有时会偏离正常生长的林木，这也是导致<span class="xref"><a href="#Table5" ref-type="table">表 5</a></span>中有部分树木的测算树高与实测高相差较大的原因。</p>
+																																																											<p class="Ident-First-Line">利用高分辨率卫星图像直接测定与材积相关的测树因子，并编制出一元或二元材积表，这种方法是可行的，随着卫星图像分辨率的提高，材积表的精度会进一步高，从而编制出高精度的卫星图像林分材积表。</p>
+																																																											<p class="Ident-First-Line">目前已有材积表的树种还非常有限，如湖南省只有杉木和马尾松立木材积表；湿地松和杨树只编制出了地方性的材积表; 阔叶树只编制出了通用材积表，没有分到树种；而卫星图像材积表又需要这些材积表，因此，卫星图像立木材积表在树种局限性、材积表的适应性和精度等方面依赖于现有的材积表。</p>
+																																												
+</div>
+
+
+
+<div class="article_reference"> 
+<span class="outline_anchor article_reference_title"><b>参考文献(References)</b></span><div class="clear"></div> 
+<table>
+    <tr id="b成子纯1990">
+                <td class="citation"><div class="ckwxbreak">
+    成子纯编著.森林测计学.北京:中国林业出版社, 1990:98-99                   
+
+</div></td></tr>    <tr id="b侯长谋2000">
+                <td class="citation"><div class="ckwxbreak">
+
+
+    侯长谋, 杨燕琼, 黄平, 等. 2000. 基于RS, GIS的马尾松林分蓄积量判读模型的研究.  <a href="http://www.cnki.com.cn/Article/CJFDTotal-LYZY200205015.htm" target="_blank" title="点击浏览原文">林业资源管理, (5): 55-58.</a>        </div></td></tr>    <tr id="b林辉2002">
+                <td class="citation"><div class="ckwxbreak">
+
+    林辉, 刘泰龙, 李际平. 2002. 遥感技术基础教程. 长沙: 中南大学出版社, 165-178.        
+</div></td></tr>    <tr id="b孟宪宇1999">
+                <td class="citation"><div class="ckwxbreak">
+    孟宪宇主编.测树学.北京:中国林业出版社, 1999:51-86                   
+
+</div></td></tr>    <tr id="b宁小年1995">
+                <td class="citation"><div class="ckwxbreak">
+
+    宁小年, 吕松棠, 杨小勤, 等. 1995. 遥感图像处理与应用. 北京: 地震出版社, 75-80.        
+</div></td></tr>    <tr id="b欧润贵1989">
+                <td class="citation"><div class="ckwxbreak">
+
+    欧润贵. 1989. 林业遥感. 北京: 中国林业出版社, 114-132.        
+</div></td></tr>    <tr id="b孙家抦1997">
+                <td class="citation"><div class="ckwxbreak">
+
+    孙家抦, 舒宁, 关泽群. 1997. 遥感原理, 方法和应用. 北京: 测绘出版社, 195-202.        
+</div></td></tr>    <tr id="b章孝灿1997">
+                <td class="citation"><div class="ckwxbreak">
+
+    章孝灿, 黄智才, 赵之洪编著. 1997. 遥感数字图像处理. 杭州: 浙江大学出版社, 87.        
+</div></td></tr>    <tr id="b赵宪文2001">
+                <td class="citation"><div class="ckwxbreak">
+
+    赵宪文, 李崇贵. 2001. 基于"3S"技术的森林资源定量估测. 北京: 中国科学出版社, 18-41.        
+</div></td></tr></table></div>
+
+<!-------------------------------内容正文结束-------------------------------------->
+<IFRAME id="Bottom" border=0 src="bottom.html" scrolling=no frameborder=0 width="100%"  > </IFRAME>
+</div></div></div><div id="pageftr"></div></div>
+<input type="hidden" id="resourceLink" value=""/>
+<script type="text/javascript" src="js/ZeroClipboard.min.js"></script>
+<script type="text/javascript" src="js/test2.js"></script>
+</body>
+</html>

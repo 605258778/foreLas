@@ -1,13 +1,15 @@
-# FORA — FORest Analysis
+# foreLas — 激光点云林木分析系统
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://reactjs.org/)
 [![Three.js](https://img.shields.io/badge/Three.js-r128-000000?logo=three.js)](https://threejs.org/)
-[![Version](https://img.shields.io/badge/version-1.8.0-brightgreen.svg)](https://github.com/fora-platform/fora/releases)
+[![Version](https://img.shields.io/badge/version-2.1.0-brightgreen.svg)](#quick-start)
 
-**FORA** is an open-source, browser-based platform for processing forest LiDAR point clouds at the individual-tree and stand levels. All computation runs entirely on the client side — no installation, no server, no programming knowledge required, and point cloud data never leaves the user's device.
+**foreLas** is an open-source, browser-based platform for processing forest LiDAR point clouds at the individual-tree and stand levels. All computation runs entirely on the client side — no installation, no server, no programming knowledge required, and point cloud data never leaves the user's device.
 
-**Live demo:** [fora-platform.github.io/fora](https://fora-platform.github.io/fora)
+**版权所有：贵州嘉绿科技咨询有限公司。**
+
+**访问路径：** `/foreLas/`；本地开发地址为 `http://localhost:5173/foreLas/`。
 
 ## Features
 
@@ -27,15 +29,14 @@
 
 ## Quick start
 
-### Use online (no install)
-Open [fora-platform.github.io/fora](https://fora-platform.github.io/fora) in Chrome, Firefox, Edge, or Safari.
+### Access the application
+开发服务启动后，访问 [localhost:5173/foreLas/](http://localhost:5173/foreLas/)。部署时使用 `/foreLas/` 路径；公开域名由实际部署环境确定。
 
 ### Run locally
 Prerequisite: Node.js 18+ (20 LTS recommended)
 
 ```bash
-git clone https://github.com/fora-platform/fora.git
-cd fora
+cd foreLas
 npm install
 npm run dev
 ```
@@ -52,7 +53,9 @@ npm run preview
 - To preserve precision for projected coordinates with large values (e.g. UTM northings), absolute coordinates are reduced by a double-precision local origin before being stored as single-precision floats. The origin is retained internally so that absolute coordinates are reconstructed for CSV export and external-DTM matching.
 - Small LAS files covering formats 0–3 and 6–8 are provided in [`test_data/`](test_data/) together with the generator script [`test_data/make_test_las.R`](test_data/make_test_las.R). Each file contains a flat ground surface (class 2) and three tree clusters (class 5). Load a file and set the point colouring to *Classification*: the ground should render brown and the tree clusters green in every format. Reading the classification byte from the wrong offset makes the two groups collapse into a single colour, so this is a direct check of the LAS 1.4 handling. The colour-carrying formats (2, 3, 7, 8) store the same brown/green pattern as RGB, which likewise checks the per-format colour offset (byte 20, 28 and 30 respectively).
 
-## Reproducing the validation
+## Reproducing the upstream FORA validation
+
+以下保留原始 FORA 的验证资料、数据文件名及脚本变量名，用于追溯来源。
 
 The full validation can be reproduced with [`validation/fora_validation.R`](validation/fora_validation.R). It covers:
 
@@ -92,7 +95,9 @@ Each archive provides ground-classified point clouds and per-site vegetation ret
 
 ## Citation
 
-If you use FORA, please cite the archived release (see [`CITATION.cff`](CITATION.cff)) and the SoftwareX article once published. The concept DOI [10.5281/zenodo.19546162](https://doi.org/10.5281/zenodo.19546162) always resolves to the latest version; each release also has its own version DOI.
+foreLas 2.1.0 的维护与修改版权归贵州嘉绿科技咨询有限公司；原始项目来源为 [FORA](https://github.com/fora-platform/fora)。下列归档引用信息仅对应原始 FORA，当前 foreLas 尚未关联独立 DOI。
+
+If you use the upstream FORA, please cite the archived release (see [`CITATION.cff`](CITATION.cff)) and the SoftwareX article once published. The concept DOI [10.5281/zenodo.19546162](https://doi.org/10.5281/zenodo.19546162) always resolves to the latest version; each release also has its own version DOI.
 
 ## License
 

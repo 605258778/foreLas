@@ -19,7 +19,7 @@ import { parseLAS } from "../src/lasParser.js";
 const here = dirname(fileURLToPath(import.meta.url));
 const dataDir = join(here, "..", "test_data");
 
-const load = (name) => {
+const load = (name, samplePercent = null) => {
   const path = join(dataDir, name);
   if (!existsSync(path)) {
     throw new Error(
@@ -28,7 +28,7 @@ const load = (name) => {
     );
   }
   const buf = readFileSync(path);
-  return parseLAS(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
+  return parseLAS(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength), samplePercent);
 };
 
 const cases = [
@@ -107,4 +107,43 @@ test("coordinates are returned relative to a double-precision origin", () => {
 test("a file that is not LAS is rejected", () => {
   const junk = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]).buffer;
   assert.throws(() => parseLAS(junk));
+});
+
+test("manual percentages keep the requested share across the file with matching attributes", () => {
+  const full = load("test_fmt7.las", 100);
+  for (const percent of [1, 37, 50, 99, 100]) {
+    const sampled = load("test_fmt7.las", percent);
+    assert.equal(sampled.nOrig, 560);
+    assert.equal(sampled.n, Math.ceil(560 * percent / 100));
+    assert.equal(sampled.samplePercent, percent);
+    for (let j = 0; j < sampled.n; j++) {
+      const original = Math.floor(j * full.n / sampled.n);
+      for (const attribute of ["x", "y", "z", "r", "g", "b", "intensity", "classification"]) {
+        assert.equal(sampled[attribute][j], full[attribute][original], `${percent}% ${attribute}`);
+      }
+    }
+  }
+});
+
+test("automatic sampling remains the default above 5 million, while 100% reads every point", () => {
+  const count = 5_000_001, header = 227, record = 20;
+  const buffer = new ArrayBuffer(header + count * record);
+  const view = new DataView(buffer);
+  new Uint8Array(buffer, 0, 4).set([76, 65, 83, 70]);
+  view.setUint8(24, 1);view.setUint8(25, 2);
+  view.setUint32(96, header, true);
+  view.setUint16(105, record, true);
+  view.setUint32(107, count, true);
+  for (const offset of [131, 139, 147]) view.setFloat64(offset, 1, true);
+  view.setInt32(header + (count - 1) * record + 8, 123, true);
+  assert.equal(parseLAS(buffer).n, 2_500_001);
+  const full = parseLAS(buffer, 100);
+  assert.equal(full.n, count);
+  assert.equal(full.z[count - 1], 123, "the last point must be loaded too");
+});
+
+test("invalid manual percentages are rejected", () => {
+  for (const value of [0, 101, -1, 1.5, NaN, Infinity, "50"]) {
+    assert.throws(() => parseLAS(new ArrayBuffer(0), value), /1–100/);
+  }
 });
