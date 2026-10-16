@@ -21,6 +21,10 @@
 @media(max-width:550px){.landing-nav{height:auto;min-height:72px;flex-wrap:wrap;padding-block:12px}.brand{font-size:14px;letter-spacing:0}.nav-links{margin-left:auto}.dashboard-hero-art{top:-100px}}
 
 /* Forest analytics workspace */
+.workspace-label-toggle{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ws-secondary);white-space:nowrap;cursor:pointer}.workspace-label-toggle input{accent-color:var(--ws-accent);margin:0}
+.workspace-three-view .workspace-tree-labels{width:100%;height:100%;pointer-events:none;z-index:1}
+.metrics-selection{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:10px 0;color:var(--ws-muted);font-size:11px;line-height:1.6}.metrics-selection b{color:var(--ws-accent)}.metrics-selection button{padding:4px 8px;border:1px solid var(--ws-line);border-radius:5px;background:var(--ws-bg);color:var(--ws-accent);font-size:10px}
+.workspace-panel-content .tree-id-button{min-height:26px;min-width:26px;padding:2px;border:0;background:none;color:inherit;font:inherit;font-weight:700}.tree-id-button:focus-visible{outline:1px solid var(--ws-accent);outline-offset:1px}
 .analysis-workspace{height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden;background:var(--ws-bg);color:var(--ws-text);font-family:Inter,"Microsoft YaHei","Segoe UI",system-ui,sans-serif;font-size:13px;--ws-raised:#103326;--ws-soft:#9cf5bc0c;--ws-shadow:#0003;color-scheme:dark}
 .workspace-light{--ws-raised:#edf5ef;--ws-soft:#18754808;--ws-shadow:#173d2610;color-scheme:light}
 .workspace-header{flex-shrink:0;min-height:78px;padding:12px 26px;display:flex;align-items:center;gap:30px;border-bottom:1px solid var(--ws-line);background:linear-gradient(110deg,var(--ws-panel),transparent),var(--ws-bg)}

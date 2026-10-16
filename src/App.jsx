@@ -15,6 +15,7 @@ import {ProcessingProgress, useProcessingTask} from "./ProcessingProgress.jsx";
 import {calculateTreeVolume,summarizeVolumes,volumeCSV,DEFAULT_VOLUME_OPTIONS} from './volumeAnalysis.js';
 import {treeMetricsCSV,areaMetricsCSV} from './metricsExport.js';
 import {VolumePanel,VolumeSummary} from './VolumePanel.jsx';
+import {getTreeTops,getTreeMarkers,projectTreeMarkers,drawTreeLabels,hitTreeLabel} from './treeLabels.js';
 const CL=["#e6194b","#3cb44b","#ffe119","#4363d8","#f58231","#911eb4","#42d4f4","#f032e6","#bfef45","#fabed4","#469990","#dcbeff","#9A6324","#800000","#aaffc3","#808000"];
 function hC(t){return[t<.5?0:(t-.5)*2,t<.5?t*2:(1-t)*2,t<.5?(.5-t)*2:0];}
 function nS(r){if(r<=0)return 1;const raw=r/6,mg=10**Math.floor(Math.log10(raw)),n=raw/mg;return(n<1.5?1:n<3.5?2:n<7.5?5:10)*mg;}
@@ -44,6 +45,7 @@ const[segs,setSegs]=useState(null);const[met,setMet]=useState(null);const[areaMe
 const[volumeConfig,setVolumeConfig]=useState(null);const[clipRoi,setClipRoi]=useState(null);
 const[volumeDraft,setVolumeDraft]=useState(DEFAULT_VOLUME_OPTIONS);
 const[sel,setSel]=useState(null);const[sp,setSp]=useState("ps");const[cMode,setCMode]=useState("height");const[view,setView]=useState("2d");
+const[showTreeIds,setShowTreeIds]=useState(true);
 const[ptSz,setPtSz]=useState(1.5);const[ptPct,setPtPct]=useState(100);const[sCell,setSCell]=useState(0.5);const[sMinH,setSMinH]=useState(2);const[sSR,setSSR]=useState(3);
 const[loadMode,setLoadMode]=useState("auto");const[loadPct,setLoadPct]=useState(100);
 const {task,runTask,isProcessing:isLoading}=useProcessingTask();
@@ -63,6 +65,15 @@ const dR=useRef(),zR=useRef(),cR=useRef(),czR=useRef(),mR=useRef();
 dR.current=data;zR.current=zN;cR.current=clp;czR.current=clpZ;mR.current=met;
 const cam3D=useRef({theta:Math.PI/4,phi:Math.PI/3.2,dist:0});
 const aP=clp||data,aZ=clpZ||zN,aB=clp?clpB:bnd;
+const treeTops=useMemo(()=>getTreeTops(aP,segs?.labels),[aP,segs]);
+const treeMarkers=useMemo(()=>getTreeMarkers(met,aP,treeTops),[met,aP,treeTops]);
+const treeLabelsVisible=tab==="metrics"&&showTreeIds&&treeMarkers.length>0;
+const treeLabelState=useMemo(()=>({markers:treeMarkers,visible:treeLabelsVisible,selected:sel}),[treeMarkers,treeLabelsVisible,sel]);
+const treeLabelStateR=useRef(treeLabelState);treeLabelStateR.current=treeLabelState;
+const metricRows=useMemo(()=>{const rows=met?.slice(0,200)||[];const chosen=met?.find(m=>m.id===sel);return chosen&&!rows.some(m=>m.id===sel)?[chosen,...rows.slice(0,199)]:rows;},[met,sel]);
+const selectTree=useCallback(id=>{setSel(previous=>previous===id?null:id);setCMode("segment");},[]);
+const pickTreeLabel=useCallback((canvas,event)=>{if(!canvas)return false;const rect=canvas.getBoundingClientRect();const id=hitTreeLabel(canvas._treeLabels,(event.clientX-rect.left)*canvas.width/rect.width,(event.clientY-rect.top)*canvas.height/rect.height);if(id===null)return false;selectTree(id);return true;},[selectTree]);
+useEffect(()=>{if(tab==="metrics"&&sel!==null&&window.matchMedia("(min-width: 761px)").matches)inspectorContentR.current?.querySelector(`[data-tree-id="${sel}"]`)?.scrollIntoView({block:"nearest",inline:"nearest"});},[sel,tab]);
 const volumeSummary=useMemo(()=>summarizeVolumes(met,aB,clipRoi,volumeConfig?.areaOverride??''),[met,aB,clipRoi,volumeConfig]);
 const dk=theme==="dark"?"#041510":"#f0f6f2",pn2=theme==="dark"?"#0b241c":"#ffffff",bd=theme==="dark"?"#28523e":"#cfdfd4";
 const ac=theme==="dark"?"#9cf5bc":"#187548",gn2=theme==="dark"?"#86efac":"#237c4e",og=theme==="dark"?"#f5c578":"#97601d",tx=theme==="dark"?"#ecfff3":"#183526",txD=theme==="dark"?"#88aa98":"#647e6f",txM=theme==="dark"?"#b0cbbd":"#4c6b59";
@@ -82,9 +93,9 @@ const handleFile=useCallback((e,samplePercent=appliedSamplingR.current)=>{const 
 const handleDTM=useCallback(e=>{const f=e.target.files[0];if(!f)return;
   return runProcess("加载地面模型","dtm",{file:f},dtm=>{setExtDTM(dtm);setDtmSrc("external");setMsg(`✓ DTM 已加载（${dtm.w}×${dtm.h} 格网）`);});},[runProcess]);
 const hClip=useCallback(()=>{if(!data||!cc||!zN)return;
-  return runProcess("样地点云裁剪","clip",{x:cc.x,y:cc.y,radius:cr,shape:cs},({pts,zN,bounds})=>{setClp(pts);setClipRoi({shape:cs,r:cr});setClpZ(zN);setClpB(bounds);setSegs(null);setMet(null);setVolumeConfig(null);setVolumeDraft(DEFAULT_VOLUME_OPTIONS);setAreaMet(null);setAreaErr("");setPan({x:0,y:0});setZoom(1);setMsg("");});},[data,zN,cc,cr,cs,runProcess]);
+  return runProcess("样地点云裁剪","clip",{x:cc.x,y:cc.y,radius:cr,shape:cs},({pts,zN,bounds})=>{setClp(pts);setSel(null);setClipRoi({shape:cs,r:cr});setClpZ(zN);setClpB(bounds);setSegs(null);setMet(null);setVolumeConfig(null);setVolumeDraft(DEFAULT_VOLUME_OPTIONS);setAreaMet(null);setAreaErr("");setPan({x:0,y:0});setZoom(1);setMsg("");});},[data,zN,cc,cr,cs,runProcess]);
 const hSeg=useCallback(()=>{if(!dR.current||!zR.current)return;
-  return runProcess("单木分割与指标提取","segment",{useClip:!!clp,cell:sCell,minHeight:sMinH,radius:sSR,vwsMode,vwsPreset,vwsCustom,crownMode},({segments,metrics})=>{setSegs(segments);setVolumeConfig(null);setVolumeDraft(DEFAULT_VOLUME_OPTIONS);setAreaMet(null);setAreaErr("");setCMode("segment");setMet(metrics);setMsg("");setTab("metrics");});},[clp,sCell,sMinH,sSR,vwsMode,vwsPreset,vwsCustom,crownMode,runProcess]);
+  return runProcess("单木分割与指标提取","segment",{useClip:!!clp,cell:sCell,minHeight:sMinH,radius:sSR,vwsMode,vwsPreset,vwsCustom,crownMode},({segments,metrics})=>{setSegs(segments);setSel(null);setShowTreeIds(true);setVolumeConfig(null);setVolumeDraft(DEFAULT_VOLUME_OPTIONS);setAreaMet(null);setAreaErr("");setCMode("segment");setMet(metrics);setMsg("");setTab("metrics");});},[clp,sCell,sMinH,sSR,vwsMode,vwsPreset,vwsCustom,crownMode,runProcess]);
 const hArea=useCallback(()=>{if(!dR.current||!zR.current)return;
   return runProcess("林分统计计算","area",{useClip:!!clp,metrics:mR.current,roi:clipRoi},r=>{if(typeof r==="string"){setAreaErr(r);setAreaMet(null);}else{setAreaMet(r);setAreaErr("");}setMsg("");});},[clp,clipRoi,runProcess]);
 const hSp=useCallback(()=>{if(!met)return;
@@ -94,11 +105,10 @@ const hVolume=useCallback(options=>runProcess("蓄积评估计算","volume",{met
 const hCSV=useCallback(()=>{if(!met)return;return runProcess("导出单木指标",async report=>{report(25,"整理单木指标、材积与林分统计");dlF(new Blob(["\uFEFF"+treeMetricsCSV(met,areaMet,volumeSummary,volumeConfig)],{type:"text/csv;charset=utf-8"}),"foreLas_tree_metrics.csv");});},[met,areaMet,volumeSummary,volumeConfig,runProcess]);
 const hAreaCSV=useCallback(()=>{if(!areaMet)return;return runProcess("导出林分统计",async report=>{report(25,"整理林分与蓄积量统计");dlF(new Blob(["\uFEFF"+areaMetricsCSV(areaMet,volumeSummary,volumeConfig)],{type:"text/csv;charset=utf-8"}),"foreLas_area_metrics.csv");});},[areaMet,volumeSummary,volumeConfig,runProcess]);
 const hVolumeCSV=useCallback(()=>{if(!met||!volumeConfig)return;return runProcess("导出蓄积评估",async report=>{report(25,"整理单木材积与统计");dlF(new Blob(["\uFEFF"+volumeCSV(met,volumeSummary,volumeConfig)],{type:"text/csv;charset=utf-8"}),"foreLas_volume.csv");});},[met,volumeSummary,volumeConfig,runProcess]);
-const hImg=useCallback(()=>runProcess("导出当前视图",async report=>{report(25,"生成视图图像");if(view==="3d"){const el=threeR.current;if(!el)return;const wc=el.querySelector("canvas");if(!wc)return;try{const url=wc.toDataURL("image/png");const a=document.createElement("a");a.href=url;a.download="foreLas_3d.png";document.body.appendChild(a);a.click();document.body.removeChild(a);}catch(err){throw new Error("图像导出失败："+err.message);}
+const hImg=useCallback(()=>runProcess("导出当前视图",async report=>{report(25,"生成视图图像");if(view==="3d"){const el=threeR.current;if(!el)return;const wc=el.querySelector("canvas");if(!wc)return;try{const composite=document.createElement("canvas");composite.width=wc.width;composite.height=wc.height;const context=composite.getContext("2d");context.drawImage(wc,0,0);const labels=el.querySelector(".workspace-tree-labels");if(labels)context.drawImage(labels,0,0,composite.width,composite.height);const url=composite.toDataURL("image/png");const a=document.createElement("a");a.href=url;a.download="foreLas_3d.png";document.body.appendChild(a);a.click();document.body.removeChild(a);}catch(err){throw new Error("图像导出失败："+err.message);}
 }else{const cv=topR.current;if(!cv)return;const W=cv.width,H=cv.height;const tmp=document.createElement("canvas");tmp.width=W;tmp.height=H;const ctx=tmp.getContext("2d");ctx.drawImage(cv,0,0);
-const m=mR.current;if(m&&m.length>0&&cv._tr){const{oX,oY,sc,xMn,yMn}=cv._tr;const isDk=theme==="dark";ctx.font="bold 18px monospace";ctx.textAlign="center";ctx.textBaseline="middle";
-m.forEach(t=>{const rx=t.cxRel!==undefined?t.cxRel:t.cx,ry=t.cyRel!==undefined?t.cyRel:t.cy;const px=oX+(rx-xMn)*sc,py=oY-(ry-yMn)*sc;if(px<0||px>W||py<0||py>H)return;ctx.fillStyle=isDk?"#000000cc":"#ffffffcc";ctx.beginPath();ctx.arc(px,py,12,0,Math.PI*2);ctx.fill();ctx.fillStyle=isDk?"#ffffff":"#000000";ctx.fillText(t.id,px,py);});}
-ctx.font="bold 20px monospace";ctx.fillStyle=ac;ctx.textAlign="left";ctx.textBaseline="top";ctx.fillText(`${FORELAS_NAME} ${FORELAS_VERSION} · 激光点云林木分析系统`,10,10);await new Promise((resolve,reject)=>tmp.toBlob(blob=>{if(blob){dlF(blob,"foreLas_map.png");resolve();}else reject(new Error("图像导出失败"));},"image/png"));}}),[view,theme,runProcess]);
+if(tab!=="metrics"&&cv._tr)drawTreeLabels(ctx,projectTreeMarkers(treeMarkers,cv._tr),{width:W,height:H,scale:2,theme,colors:CL});
+ctx.font="bold 20px monospace";ctx.fillStyle=ac;ctx.textAlign="left";ctx.textBaseline="top";ctx.fillText(`${FORELAS_NAME} ${FORELAS_VERSION} · 激光点云林木分析系统`,10,10);await new Promise((resolve,reject)=>tmp.toBlob(blob=>{if(blob){dlF(blob,"foreLas_map.png");resolve();}else reject(new Error("图像导出失败"));},"image/png"));}}),[view,theme,runProcess,treeMarkers,tab]);
 const uMet=useCallback((id,f,v)=>{setMet(prev=>prev.map(m=>{if(m.id!==id)return m;const updated={...m,[f]:v};return volumeConfig&&(f==="dbhManual"||f==="hManual")?calculateTreeVolume(updated,volumeConfig):updated;}));},[volumeConfig]);
 const hReset=()=>{setClp(null);setClipRoi(null);setClpZ(null);setClpB(null);setSegs(null);setMet(null);setVolumeConfig(null);setVolumeDraft(DEFAULT_VOLUME_OPTIONS);setAreaMet(null);setAreaErr("");setCC(null);setSel(null);setCMode("height");setPan({x:0,y:0});setZoom(1);setTP1(null);setTP2(null);setTData(null);};
 const cSt=useCallback(pairs=>{if(!pairs||pairs.length<3)return null;const n=pairs.length,df=n-1,diffs=pairs.map(p=>p.a-p.b),mD=diffs.reduce((s,v)=>s+v,0)/n,rmse=Math.sqrt(diffs.reduce((s,v)=>s+v*v,0)/n);const mA=pairs.reduce((s,p)=>s+p.a,0)/n,mB=pairs.reduce((s,p)=>s+p.b,0)/n;let sAB=0,sAA=0,sBB=0;pairs.forEach(p=>{sAB+=(p.a-mA)*(p.b-mB);sAA+=(p.a-mA)**2;sBB+=(p.b-mB)**2;});const r2=sAA>0&&sBB>0?(sAB/(Math.sqrt(sAA)*Math.sqrt(sBB)))**2:0;const se=Math.sqrt(diffs.reduce((s,v)=>s+(v-mD)**2,0)/(n*(n-1)));const ts=se>0?mD/se:0;const ax=Math.abs(ts),tt=1/(1+.2316419*ax),nd=.3989422804*Math.exp(-ax*ax/2),pt=nd*tt*(.3193815+tt*(-.3565638+tt*(1.781478+tt*(-1.821256+tt*1.330274)))),cf=df<30?1+1/(4*df)+(1+2*ax*ax)/(16*df*df):1,pv=Math.min(1,2*pt*cf);return{n,rmse:rmse.toFixed(2),bias:mD.toFixed(2),r2:r2.toFixed(3),t:ts.toFixed(2),p:pv<.001?"<0.001":pv.toFixed(3)};},[]); 
@@ -126,7 +136,8 @@ ctx.fillRect(px,py,ptSz,ptSz);}
 if(!clp&&cc&&isTop){const cx2=oX+(cc.x-xMn)*sc,cy2=oY-(cc.y-yMn)*sc,r2=cr*sc;ctx.shadowColor="#00ffff";ctx.shadowBlur=12;ctx.strokeStyle="#00ffff";ctx.lineWidth=3;ctx.setLineDash([8,4]);ctx.beginPath();if(cs==="circle")ctx.arc(cx2,cy2,r2,0,Math.PI*2);else ctx.rect(cx2-r2,cy2-r2,r2*2,r2*2);ctx.stroke();ctx.setLineDash([]);ctx.shadowBlur=0;ctx.fillStyle="#00ffff";ctx.beginPath();ctx.arc(cx2,cy2,6,0,Math.PI*2);ctx.fill();ctx.font="bold 16px monospace";ctx.fillText(`r=${cr}m`,cx2+10,cy2-10);}
 if(tP1&&isTop){const ax=oX+(tP1.x-xMn)*sc,ay=oY-(tP1.y-yMn)*sc;ctx.fillStyle="#ff6384";ctx.beginPath();ctx.arc(ax,ay,6,0,Math.PI*2);ctx.fill();
 if(tP2){const bx=oX+(tP2.x-xMn)*sc,by=oY-(tP2.y-yMn)*sc;ctx.strokeStyle="#ff6384";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.stroke();ctx.fillStyle="#ff6384";ctx.beginPath();ctx.arc(bx,by,6,0,Math.PI*2);ctx.fill();const d=Math.sqrt((tP2.x-tP1.x)**2+(tP2.y-tP1.y)**2);ctx.font="bold 14px monospace";ctx.fillText(`${d.toFixed(1)}m`,(ax+bx)/2+8,(ay+by)/2-8);}}
-cv._tr={oX,oY,sc,xMn,yMn,W,H};};
+cv._tr={oX,oY,sc,xMn,yMn,W,H};
+cv._treeLabels=treeLabelsVisible?drawTreeLabels(ctx,projectTreeMarkers(treeMarkers,cv._tr,isTop),{width:W,height:H,scale:2,theme,selected:sel,colors:CL}):[];};
 drawC(topR.current,true);drawC(sideR.current,false);
 // TRANSECT — ayrı sabit canvas, topR'den bağımsız
 const tc=transR.current;if(tc&&tData&&tData.length>0&&tc.offsetWidth>0){
@@ -142,7 +153,7 @@ ctx.beginPath();for(let i=0;i<sorted.length;i++){const x=pL+sorted[i].dist*sx,y=
 for(const p of tData){const px=pL+p.dist*sx,py=H-pBt-p.zN*sz,t=mZ>0?p.zN/mZ:0;const[r,g,b2]=hC(t);ctx.fillStyle=`rgb(${r*255|0},${g*255|0},${b2*255|0})`;ctx.fillRect(px-1,py-1,2,2);}
 if(mZ>1.3){const y=H-pBt-1.3*sz;ctx.strokeStyle="#f5920055";ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(pL,y);ctx.lineTo(W-pRt,y);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle="#f59200";ctx.font="12px monospace";ctx.fillText("1.3m",W-pRt+2,y+4);}
 ctx.fillStyle=ac;ctx.font="bold 14px monospace";ctx.fillText(`Transect: ${mD2.toFixed(1)}m | Hmax: ${mZ.toFixed(1)}m | ${tData.length}pts`,pL,14);}
-},[aP,aB,aZ,cc,cr,cs,cMode,segs,ptSz,ptPct,clp,sel,pan,zoom,theme,dk,txD,tP1,tP2,tData]);
+},[aP,aB,aZ,cc,cr,cs,cMode,segs,ptSz,ptPct,clp,sel,pan,zoom,theme,dk,txD,tP1,tP2,tData,treeLabelsVisible,treeMarkers]);
 useEffect(()=>{if(view!=="2d"||!aP)return;draw2D();let frame;const observer=new ResizeObserver(()=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(draw2D);});[topR.current,sideR.current,transR.current].filter(Boolean).forEach(el=>observer.observe(el));return()=>{observer.disconnect();cancelAnimationFrame(frame);};},[draw2D,view,aP]);
 // Transect canvas, açılma animasyonu (height 0→160) bittikten sonra 0-yükseklikli
 // canvas'a çizildiği için ilk anda boş kalıyordu. Konteyner gerçek yüksekliğe
@@ -155,6 +166,7 @@ raf=requestAnimationFrame(tick);return()=>cancelAnimationFrame(raf);},[hasTrans,
 useEffect(()=>{if(view!=="3d"||!aP||!aB)return;const el=threeR.current;if(!el)return;if(cleanR.current){cleanR.current();cleanR.current=null;}
 const W=el.offsetWidth,H=el.offsetHeight;if(!W||!H)return;const scene=new THREE.Scene();scene.background=new THREE.Color(theme==="dark"?0x041510:0xf0f6f2);
 const cam=new THREE.PerspectiveCamera(55,W/H,.1,1e4);const ren=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});ren.setSize(W,H);el.appendChild(ren.domElement);
+const labelCanvas=document.createElement("canvas");labelCanvas.className="workspace-tree-labels";labelCanvas.setAttribute("aria-hidden","true");labelCanvas.width=W*2;labelCanvas.height=H*2;el.appendChild(labelCanvas);const labelCtx=labelCanvas.getContext("2d");let labelsDirty=true,lastLabelState=null;const projectedPoint=new THREE.Vector3();
 const cx=(aB.x0+aB.x1)/2,cy=(aB.y0+aB.y1)/2,cz=(aB.z0+aB.z1)/2,range=Math.max(aB.x1-aB.x0,aB.y1-aB.y0,aB.z1-aB.z0)||10;
 if(cam3D.current.dist===0)cam3D.current.dist=range*1.1;let{theta,phi,dist}=cam3D.current;
 const mP=Math.floor(8e5*(ptPct/100)),st=aP.x.length>mP?Math.ceil(aP.x.length/mP):1,cnt=Math.ceil(aP.x.length/st);
@@ -171,15 +183,15 @@ else{const t=aB.z1===aB.z0?.5:(aP.z[i]-aB.z0)/(aB.z1-aB.z0);const[r,g,b2]=hC(t);
 const geom=new THREE.BufferGeometry();geom.setAttribute("position",new THREE.BufferAttribute(pos,3));geom.setAttribute("color",new THREE.BufferAttribute(col,3));
 const mat=new THREE.PointsMaterial({size:ptSz*.8,vertexColors:true,sizeAttenuation:true});scene.add(new THREE.Points(geom,mat));
 const gs=Math.ceil(range/10)*10;const grid=new THREE.GridHelper(gs,Math.ceil(gs/5),theme==="dark"?0x1a3528:0xa8c8a8,theme==="dark"?0x112218:0xc8dcc8);grid.position.y=-(aB.z1-aB.z0)/2;scene.add(grid);
-const upC=()=>{cam.position.set(dist*Math.sin(phi)*Math.cos(theta),dist*Math.cos(phi),dist*Math.sin(phi)*Math.sin(theta));cam.lookAt(0,0,0);cam3D.current={theta,phi,dist};};upC();
-let drag=false,px_=0,py_=0;const dE=ren.domElement;
-const oD=e=>{drag=true;px_=e.clientX;py_=e.clientY;};const oM=e=>{if(!drag)return;theta+=(e.clientX-px_)*.005;phi=Math.max(.1,Math.min(Math.PI-.1,phi-(e.clientY-py_)*.005));px_=e.clientX;py_=e.clientY;upC();};
-const oU=()=>{drag=false;};const oW=e=>{dist*=e.deltaY>0?1.08:.92;dist=Math.max(range*.05,Math.min(range*6,dist));upC();e.preventDefault();};
+const upC=()=>{cam.position.set(dist*Math.sin(phi)*Math.cos(theta),dist*Math.cos(phi),dist*Math.sin(phi)*Math.sin(theta));cam.lookAt(0,0,0);cam3D.current={theta,phi,dist};labelsDirty=true;};upC();
+let drag=false,moved=false,startX=0,startY=0,px_=0,py_=0;const dE=ren.domElement;
+const oD=e=>{drag=true;moved=false;startX=px_=e.clientX;startY=py_=e.clientY;};const oM=e=>{if(!drag)return;if(Math.abs(e.clientX-startX)>4||Math.abs(e.clientY-startY)>4)moved=true;theta+=(e.clientX-px_)*.005;phi=Math.max(.1,Math.min(Math.PI-.1,phi-(e.clientY-py_)*.005));px_=e.clientX;py_=e.clientY;upC();};
+const oU=e=>{const clicked=drag&&!moved&&e.type==="mouseup";drag=false;if(clicked)pickTreeLabel(labelCanvas,e);};const oW=e=>{dist*=e.deltaY>0?1.08:.92;dist=Math.max(range*.05,Math.min(range*6,dist));upC();e.preventDefault();};
 dE.addEventListener("mousedown",oD);dE.addEventListener("mousemove",oM);dE.addEventListener("mouseup",oU);dE.addEventListener("mouseleave",oU);dE.addEventListener("wheel",oW,{passive:false});
-const resizeObserver=new ResizeObserver(()=>{const w=el.offsetWidth,h=el.offsetHeight;if(!w||!h)return;cam.aspect=w/h;cam.updateProjectionMatrix();ren.setSize(w,h);});resizeObserver.observe(el);
-let aId;const an=()=>{aId=requestAnimationFrame(an);ren.render(scene,cam);};an();
-cleanR.current=()=>{cam3D.current={theta,phi,dist};resizeObserver.disconnect();cancelAnimationFrame(aId);dE.removeEventListener("mousedown",oD);dE.removeEventListener("mousemove",oM);dE.removeEventListener("mouseup",oU);dE.removeEventListener("mouseleave",oU);dE.removeEventListener("wheel",oW);geom.dispose();mat.dispose();ren.dispose();try{ren.forceContextLoss();}catch(_){}if(el.contains(dE))el.removeChild(dE);};
-return()=>{if(cleanR.current){cleanR.current();cleanR.current=null;}};},[view,aP,aB,aZ,cMode,segs,sel,ptSz,ptPct,theme]);
+const resizeObserver=new ResizeObserver(()=>{const w=el.offsetWidth,h=el.offsetHeight;if(!w||!h)return;cam.aspect=w/h;cam.updateProjectionMatrix();ren.setSize(w,h);labelCanvas.width=w*2;labelCanvas.height=h*2;labelsDirty=true;});resizeObserver.observe(el);
+let aId;const an=()=>{aId=requestAnimationFrame(an);ren.render(scene,cam);const state=treeLabelStateR.current;if(labelsDirty||lastLabelState!==state){labelCtx.clearRect(0,0,labelCanvas.width,labelCanvas.height);const projected=[];if(state.visible)for(const marker of state.markers){projectedPoint.set(marker.x-cx,marker.z-cz,-(marker.y-cy)).project(cam);if(projectedPoint.z>=-1&&projectedPoint.z<=1)projected.push({id:marker.id,x:(projectedPoint.x+1)/2*labelCanvas.width,y:(1-projectedPoint.y)/2*labelCanvas.height});}labelCanvas._treeLabels=drawTreeLabels(labelCtx,projected,{width:labelCanvas.width,height:labelCanvas.height,scale:2,theme,selected:state.selected,colors:CL});labelsDirty=false;lastLabelState=state;}};an();
+cleanR.current=()=>{cam3D.current={theta,phi,dist};resizeObserver.disconnect();cancelAnimationFrame(aId);dE.removeEventListener("mousedown",oD);dE.removeEventListener("mousemove",oM);dE.removeEventListener("mouseup",oU);dE.removeEventListener("mouseleave",oU);dE.removeEventListener("wheel",oW);geom.dispose();mat.dispose();ren.dispose();try{ren.forceContextLoss();}catch(_){}if(el.contains(dE))el.removeChild(dE);if(el.contains(labelCanvas))el.removeChild(labelCanvas);};
+return()=>{if(cleanR.current){cleanR.current();cleanR.current=null;}};},[view,aP,aB,aZ,cMode,segs,sel,ptSz,ptPct,theme,pickTreeLabel]);
 
 // --- mouse ---
 const handleMouse=useCallback((e,act)=>{const c=topR.current;if(!c||!c._tr)return;const rect=c.getBoundingClientRect();
@@ -188,10 +200,10 @@ if(act==="down")dragR.current={on:true,moved:false,sx:e.clientX,sy:e.clientY,px:
 else if(act==="move"){if(!dragR.current.on)return;if(Math.abs(e.clientX-dragR.current.sx)>4||Math.abs(e.clientY-dragR.current.sy)>4)dragR.current.moved=true;
 if(dragR.current.moved)setPan({x:dragR.current.px+(e.clientX-dragR.current.sx),y:dragR.current.py+(e.clientY-dragR.current.sy)});}
 else if(act==="up"){const wd=dragR.current.moved;dragR.current.on=false;dragR.current.moved=false;
-if(!wd){if(tMode){if(!tP1)setTP1({x:wx,y:wy});else{setTP2({x:wx,y:wy});if(dR.current&&zR.current)runProcess("垂直剖面提取","transect",{useClip:!!clp,p1:tP1,p2:{x:wx,y:wy}},setTData);setTMode(false);}}
+if(!wd){if(!tMode&&pickTreeLabel(c,e))return;if(tMode){if(!tP1)setTP1({x:wx,y:wy});else{setTP2({x:wx,y:wy});if(dR.current&&zR.current)runProcess("垂直剖面提取","transect",{useClip:!!clp,p1:tP1,p2:{x:wx,y:wy}},setTData);setTMode(false);}}
 else if(!clp&&zN)setCC({x:wx,y:wy});}}
 else if(act==="wheel"){e.preventDefault();setZoom(z=>Math.max(.1,Math.min(50,z*(e.deltaY>0?.9:1.1))));}
-},[clp,zN,tMode,tP1,pan,runProcess]);
+},[clp,zN,tMode,tP1,pan,runProcess,pickTreeLabel]);
 
 // --- render ---
 const hDrop=e=>{e.preventDefault();const f=e.dataTransfer&&e.dataTransfer.files[0];if(f)handleFile({target:{files:[f]}});};
@@ -230,14 +242,14 @@ if(!data)return(
    </div>
    {msg&&<div className="workspace-message" role="status">{msg}</div>}
    <section className="workspace-viewer" aria-label="点云可视化">
-    <div className="workspace-viewer-toolbar"><div className="workspace-viewer-title"><i/> 点云视图 <small>{view==="2d"?"二维联合视图":"三维交互视图"}</small></div><div className="workspace-viewer-controls"><div className="workspace-view-switch">{["2d","3d"].map(v=><button key={v} className={view===v?"selected":""} aria-pressed={view===v} onClick={()=>{if(v!==view)runProcess(v==="3d"?"生成三维点云视图":"生成二维点云视图",async report=>{report(35,"准备点云可视化");setView(v);});}}>{v.toUpperCase()}</button>)}</div><label className="workspace-color-select"><span>着色</span><select value={cMode} onChange={e=>setCMode(e.target.value)}><option value="height">原始高度</option><option value="normalized">归一化高度</option>{aP.hasRGB&&<option value="rgb">RGB 真彩色</option>}<option value="intensity">回波强度</option><option value="classification">点云分类</option>{segs&&<option value="segment">单木分割</option>}</select></label>{clp&&<button className="workspace-outline" onClick={hReset}>↩ 重置裁剪</button>}</div></div>
+    <div className="workspace-viewer-toolbar"><div className="workspace-viewer-title"><i/> 点云视图 <small>{view==="2d"?"二维联合视图":"三维交互视图"}</small></div><div className="workspace-viewer-controls">{tab==="metrics"&&met?.length>0&&<label className="workspace-label-toggle"><input type="checkbox" checked={showTreeIds} onChange={e=>setShowTreeIds(e.target.checked)}/>单木编号</label>}<div className="workspace-view-switch">{["2d","3d"].map(v=><button key={v} className={view===v?"selected":""} aria-pressed={view===v} onClick={()=>{if(v!==view)runProcess(v==="3d"?"生成三维点云视图":"生成二维点云视图",async report=>{report(35,"准备点云可视化");setView(v);});}}>{v.toUpperCase()}</button>)}</div><label className="workspace-color-select"><span>着色</span><select value={cMode} onChange={e=>setCMode(e.target.value)}><option value="height">原始高度</option><option value="normalized">归一化高度</option>{aP.hasRGB&&<option value="rgb">RGB 真彩色</option>}<option value="intensity">回波强度</option><option value="classification">点云分类</option>{segs&&<option value="segment">单木分割</option>}</select></label>{clp&&<button className="workspace-outline" onClick={hReset}>↩ 重置裁剪</button>}</div></div>
     <div className="workspace-canvas-stack">
      <div className={"workspace-canvas-layout "+(view==="2d"?"is-2d":"is-3d")}>
-      {view==="2d"?(<><div className="workspace-plan-view"><span className="workspace-view-label">俯视图 <small>XY</small></span><canvas ref={topR} style={{cursor:tMode?"crosshair":"grab"}} onMouseDown={e=>handleMouse(e,"down")} onMouseMove={e=>handleMouse(e,"move")} onMouseUp={e=>handleMouse(e,"up")} onMouseLeave={e=>{dragR.current.on=false;dragR.current.moved=false;}} onWheel={e=>handleMouse(e,"wheel")}/><div className="workspace-canvas-hint">{tMode?"样线模式：点击两个点绘制剖面":!clp&&zN?"点击设置裁剪中心 · 拖动平移 · 滚轮缩放":"拖动平移 · 滚轮缩放"}</div></div><div className="workspace-elevation-view"><span className="workspace-view-label">侧视图 <small>XZ</small></span><canvas ref={sideR}/></div></>):<div ref={threeR} className="workspace-three-view"/>}
+      {view==="2d"?(<><div className="workspace-plan-view"><span className="workspace-view-label">俯视图 <small>XY</small></span><canvas ref={topR} style={{cursor:tMode?"crosshair":"grab"}} onMouseDown={e=>handleMouse(e,"down")} onMouseMove={e=>handleMouse(e,"move")} onMouseUp={e=>handleMouse(e,"up")} onMouseLeave={e=>{dragR.current.on=false;dragR.current.moved=false;}} onWheel={e=>handleMouse(e,"wheel")}/><div className="workspace-canvas-hint">{tMode?"样线模式：点击两个点绘制剖面":treeLabelsVisible?"点击编号对照表格 · 拖动平移 · 滚轮缩放":!clp&&zN?"点击设置裁剪中心 · 拖动平移 · 滚轮缩放":"拖动平移 · 滚轮缩放"}</div></div><div className="workspace-elevation-view"><span className="workspace-view-label">侧视图 <small>XZ</small></span><canvas ref={sideR} onClick={e=>pickTreeLabel(sideR.current,e)}/></div></>):<div ref={threeR} className="workspace-three-view"/>}
      </div>
      {view==="2d"&&<div className="workspace-transect" style={{height:hasTrans?180:0}}><canvas ref={transR} onMouseDown={e=>e.stopPropagation()} onMouseMove={e=>e.stopPropagation()} onWheel={e=>e.stopPropagation()}/></div>}
     </div>
-    <div className="workspace-viewer-footer"><span><i/> {view==="2d"?"平面与高程同步展示":"拖动旋转 · 滚轮缩放"}</span><span>{cMode==="segment"?"单木分割着色":cMode==="classification"?"ASPRS 分类":cMode==="normalized"?"相对地面高度":cMode==="intensity"?"激光回波强度":cMode==="rgb"?"RGB 真彩色":"原始高程着色"}</span></div>
+    <div className="workspace-viewer-footer"><span><i/> {tab==="metrics"&&met?.length?sel!==null?`已选单木 #${sel}`:"视图编号与表格一致":view==="2d"?"平面与高程同步展示":"拖动旋转 · 滚轮缩放"}</span><span>{cMode==="segment"?"单木分割着色":cMode==="classification"?"ASPRS 分类":cMode==="normalized"?"相对地面高度":cMode==="intensity"?"激光回波强度":cMode==="rgb"?"RGB 真彩色":"原始高程着色"}</span></div>
    </section>
   </main>
   <aside className="workspace-inspector" aria-label="分析参数"><div className="workspace-inspector-heading"><small>PARAMETERS & RESULTS</small><h2>{WORKSPACE_MODULES.find(m=>m[0]===tab)?.[2]}</h2><p>{WORKSPACE_MODULES.find(m=>m[0]===tab)?.[3]}</p></div><div className="workspace-panel-content" ref={inspectorContentR}>
@@ -311,10 +323,10 @@ if(!data)return(
 {tab==="volume"&&<VolumePanel metrics={met} summary={volumeSummary} applied={volumeConfig} draft={volumeDraft} onDraftChange={setVolumeDraft} bounds={aB} roi={clipRoi} onSegment={()=>setTab("seg")} onApply={hVolume} onExport={hVolumeCSV} onMetrics={()=>setTab("metrics")} onSpecies={()=>setTab("species")}/>}
 
 {tab==="metrics"&&(<Sc t="单木指标">{!met?<div style={{fontSize:12,color:txD}}>请先运行分割</div>:(
-<div style={{overflowX:"auto"}}><button style={{...BT(true),marginBottom:6,fontSize:11}} onClick={hCSV}>📥 CSV</button><button style={{...BT(false),marginLeft:8,marginBottom:6,fontSize:11}} onClick={()=>setTab("volume")}>蓄积评估 →</button><p className="workspace-sampling-note">表格显示前 200 棵树，CSV 导出与蓄积量统计包含全部单木指标记录。</p>
-<table style={{width:"100%",borderCollapse:"collapse",fontSize:10}}><thead><tr>{["#","H","CD","X","Y","DBH₁","DBH₂","H₂","CD₂","V (m³)","N"].map(h=><th key={h} style={{textAlign:"left",padding:"2px",borderBottom:`1px solid ${bd}`,color:txD,fontWeight:500}}>{h}</th>)}</tr></thead>
-<tbody>{met.slice(0,200).map((m,i)=>(<tr key={m.id} style={{background:sel===m.id?ac+"15":i%2===0?"transparent":bd+"22",cursor:"pointer"}} onClick={()=>{setSel(sel===m.id?null:m.id);setCMode("segment");}}>
-<td style={{padding:"2px",color:CL[(m.id-1)%CL.length],fontWeight:700}}>{m.id}</td><td style={{padding:"2px"}}>{m.h.toFixed(1)}</td><td style={{padding:"2px"}}>{m.cd.toFixed(1)}</td>
+<div style={{overflowX:"auto"}}><button style={{...BT(true),marginBottom:6,fontSize:11}} onClick={hCSV}>📥 CSV</button><button style={{...BT(false),marginLeft:8,marginBottom:6,fontSize:11}} onClick={()=>setTab("volume")}>蓄积评估 →</button><p className="workspace-sampling-note">表格显示前 200 棵树，选中单木优先显示。CSV 与蓄积评估包含全部单木指标记录。</p>
+<div className="metrics-selection" role="status">{sel!==null?<><span>已选单木 <b>#{sel}</b></span><button onClick={()=>setSel(null)}>清除选择</button></>:<span>点击表格行或视图编号，高亮对应单木。</span>}</div><table style={{width:"100%",borderCollapse:"collapse",fontSize:10}}><thead><tr>{["#","H","CD","X","Y","DBH₁","DBH₂","H₂","CD₂","V (m³)","N"].map(h=><th key={h} style={{textAlign:"left",padding:"2px",borderBottom:`1px solid ${bd}`,color:txD,fontWeight:500}}>{h}</th>)}</tr></thead>
+<tbody>{metricRows.map((m,i)=>(<tr key={m.id} data-tree-id={m.id} aria-selected={sel===m.id} style={{background:sel===m.id?ac+"15":i%2===0?"transparent":bd+"22",cursor:"pointer"}} onClick={()=>selectTree(m.id)}>
+<td style={{padding:"2px",color:CL[(m.id-1)%CL.length],fontWeight:700}}><button className="tree-id-button" aria-label={`选择单木 ${m.id}`} onClick={e=>{e.stopPropagation();selectTree(m.id);}}>{m.id}</button></td><td style={{padding:"2px"}}>{m.h.toFixed(1)}</td><td style={{padding:"2px"}}>{m.cd.toFixed(1)}</td>
 <td style={{padding:"2px",fontSize:9}}>{m.cx.toFixed(1)}</td><td style={{padding:"2px",fontSize:9}}>{m.cy.toFixed(1)}</td><td style={{padding:"2px",color:m.dbhExtrapolated?og:gn2}} title={m.dbhStatus||"模型估算胸径（cm）"}>{m.dbhModel?.toFixed(1)||"–"}</td>
 <td style={{padding:"1px"}}><input aria-label={`树 ${m.id} 实测胸径 cm`} type="number" min="0" step="any" value={m.dbhManual} onChange={e=>uMet(m.id,"dbhManual",e.target.value)} onClick={e=>e.stopPropagation()} style={{...IN,width:46,padding:"1px 2px"}}/></td>
 <td style={{padding:"1px"}}><input aria-label={`树 ${m.id} 实测树高 m`} type="number" min="0" step="any" value={m.hManual} onChange={e=>uMet(m.id,"hManual",e.target.value)} onClick={e=>e.stopPropagation()} style={{...IN,width:46,padding:"1px 2px"}}/></td>
