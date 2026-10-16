@@ -43,7 +43,7 @@ export function inferMassonianaDbh(h, c, volumeFn) {
 
 export function clearModelResults(tree) {
   const { dbhModel, dbhStatus, dbhExtrapolated, species, modelId, bm_total, bm_stem, bm_branch, bm_bark, bm_needle,
-    volume, volumeModelId, volumeDbh, volumeHeight, volumeHeightSource, volumeStatus, ...rest } = tree;
+    volume, volumeModelId, volumeDbh, volumeDbhSource, volumeHeight, volumeHeightSource, volumeStatus, ...rest } = tree;
   return rest;
 }
 

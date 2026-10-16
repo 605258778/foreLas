@@ -39,6 +39,7 @@ export const FIR_VOLUME_MODELS = [
     id: "cl_gz_central", name: "贵州中心产区杉木",
     ref: "DB52/T 702—2011 · 公式（1）",
     area: "锦屏、黎平、从江、榕江、雷山、台江、剑河、天柱、三都，共九县。",
+    formula: "V = 0.000080597 × D^[1.96709 − 0.0059006(D+H)] × H^[0.7699 + 0.0072346(D+H)]",
     volumeFn: (d, h) => validMeasurements(d, h)
       ? 0.000080597 * d ** (1.96709 - 0.0059006 * (d + h)) * h ** (0.7699 + 0.0072346 * (d + h)) : NaN
   },
@@ -46,6 +47,7 @@ export const FIR_VOLUME_MODELS = [
     id: "cl_gz_general", name: "贵州一般产区杉木",
     ref: "DB52/T 702—2011 · 公式（2）",
     area: "贵州省除中心产区九县以外的其他杉木分布区域。",
+    formula: "V = 0.000088296 × D^[1.94097 − 0.0044583(D+H)] × H^[0.76012 + 0.0056841(D+H)]",
     volumeFn: (d, h) => validMeasurements(d, h)
       ? 0.000088296 * d ** (1.94097 - 0.0044583 * (d + h)) * h ** (0.76012 + 0.0056841 * (d + h)) : NaN
   }

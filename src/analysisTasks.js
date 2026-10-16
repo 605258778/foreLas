@@ -4,6 +4,7 @@ import {SP,BIOMASS} from "./speciesModels.js";
 import {GUIZHOU_MODELS,applyGuizhouModel,clearModelResults} from "./guizhouModels.js";
 import {FIR_DBH_MODEL,applyFirModel} from "./firModels.js";
 import {COMMON_SPECIES_MODELS,applyCommonSpeciesModel} from "./commonSpeciesModels.js";
+import {calculateVolumes} from "./volumeAnalysis.js";
 
 function readFile(file,asText,progress) {
   // FileReader supplies actual bytes-read progress in the browser worker.
@@ -59,7 +60,7 @@ export function createAnalysisEngine() {
       const common=COMMON_SPECIES_MODELS.some(m=>m.id===p.sp),fir=p.sp===FIR_DBH_MODEL.id,guizhou=GUIZHOU_MODELS.some(m=>m.id===p.sp);
       const bio=p.sp.startsWith("pb")?BIOMASS.pb:null;
       const metrics=p.metrics.map((m,i)=>{
-        report(i/p.metrics.length*95,`计算胸径与林木参数 ${i+1}/${p.metrics.length}`);
+        report(i/p.metrics.length*(p.volumeOptions?80:95),`计算胸径与林木参数 ${i+1}/${p.metrics.length}`);
         if(common)return applyCommonSpeciesModel(m,model);
         if(fir)return applyFirModel(m);
         if(guizhou)return applyGuizhouModel(m,model);
@@ -69,7 +70,11 @@ export function createAnalysisEngine() {
       });
       const count=metrics.filter(m=>Number.isFinite(m.dbhModel)).length,extrapolated=metrics.filter(m=>m.dbhExtrapolated).length;
       const notice=common?(model.available?`已生成 ${count} 棵树的 DBH₁（树高曲线间接反求）；${metrics.length-count} 棵输入无效或超出样本范围，未输出。模型尚未在贵州校准。`:`${model.name}：缺少已核实的胸径预测模型，DBH₁ 保持空白。`):fir?`已生成 ${count} 棵杉木的 DBH₁（冠幅回归估算）；${metrics.length-count} 棵冠幅无效，${extrapolated} 棵超出冠幅样本范围。模型尚未在贵州校准。`:guizhou?`已生成 ${count} 棵树的 DBH₁（间接估算）；${metrics.length-count} 棵输入无效或超出求解范围，${extrapolated} 棵超出文献样本范围。`:"";
-      return {metrics,notice};
+      return {metrics:p.volumeOptions?calculateVolumes(metrics,p.volumeOptions,range(80,97)):metrics,notice};
+    }
+    if(type==="volume") {
+      if(!p.metrics?.length)throw new Error("请先完成单木分割");
+      return {metrics:calculateVolumes(p.metrics,p.options,range(0,97))};
     }
     const a=active(p.useClip);if(!a.pts||!a.zN)throw new Error("请先导入点云数据");
     if(type==="clip") {

@@ -58,3 +58,33 @@ test("DTM parsing and model application return independent results with progress
   assert.equal(result.metrics[0].bm_total,undefined);
   assert.equal(metrics[0].dbhModel,25);
 });
+
+test("volume background task validates inputs and reports progress with independent results",async()=>{
+  const execute=createAnalysisEngine(),events=[];
+  const options={modelId:"pa_gz_volume",dbhSource:"manual",heightSource:"manual",areaOverride:"400"};
+  const input=[{id:1,h:30,dbhModel:40,hManual:"15",dbhManual:"20"},{id:2,h:30,dbhManual:""}];
+  const result=await execute("volume",{metrics:input,options},(...e)=>events.push(e));
+  assert.ok(Math.abs(result.metrics[0].volume-0.24800392517542437)<1e-12);
+  assert.equal(result.metrics[1].volume,null);
+  assert.equal(input[0].volume,undefined);
+  assert.ok(events.some(([,stage])=>stage.includes("材积")));
+  await assert.rejects(execute("volume",{metrics:[],options}),/分割/);
+  await assert.rejects(execute("volume",{metrics:input,options:{...options,modelId:"bad"}}),/模型/);
+});
+
+test("changing DBH models recomputes configured volumes and clears unsupported predictions",async()=>{
+  const execute=createAnalysisEngine(),events=[];
+  const volumeOptions={modelId:"cl_gz_general",dbhSource:"model",heightSource:"point"};
+  const initial=[{id:1,h:15,cd:3,cdBbox:3,dbhModel:40,volume:999,hManual:"12",dbhManual:"20"}];
+  const fir=await execute("species",{metrics:initial,sp:"cl_crown_lin2004",volumeOptions},(...e)=>events.push(e));
+  assert.ok(fir.metrics[0].volume>0&&fir.metrics[0].volume<1);
+  assert.equal(fir.metrics[0].volumeDbh,fir.metrics[0].dbhModel);
+  assert.equal(fir.metrics[0].volumeModelId,"cl_gz_general");
+  assert.ok(events.every((e,i)=>i===0||e[0]>=events[i-1][0]));
+  const missing=await execute("species",{metrics:fir.metrics,sp:"cf_dbh_pending",volumeOptions});
+  assert.equal(missing.metrics[0].volume,null);
+  const manual=await execute("species",{metrics:fir.metrics,sp:"cf_dbh_pending",volumeOptions:{...volumeOptions,dbhSource:"manual"}});
+  assert.ok(manual.metrics[0].volume>0);
+  assert.equal(manual.metrics[0].volumeDbh,20);
+  assert.equal(initial[0].volume,999);
+});

@@ -1,4 +1,4 @@
-import{useState,useRef,useEffect,useCallback}from"react";
+import{useState,useRef,useEffect,useCallback,useMemo}from"react";
 import*as THREE from"three";
 
 import{GUIZHOU_MODELS}from"./guizhouModels.js";
@@ -12,6 +12,9 @@ const CLS_COL={0:[0.6,0.6,0.6],1:[0.7,0.7,0.7],2:[0.65,0.45,0.25],3:[0.55,0.75,0
 const clsCol=c=>CLS_COL[c]||[0.5,0.5,0.5];
 import {SP} from "./speciesModels.js";
 import {ProcessingProgress, useProcessingTask} from "./ProcessingProgress.jsx";
+import {calculateTreeVolume,summarizeVolumes,volumeCSV,DEFAULT_VOLUME_OPTIONS} from './volumeAnalysis.js';
+import {treeMetricsCSV,areaMetricsCSV} from './metricsExport.js';
+import {VolumePanel,VolumeSummary} from './VolumePanel.jsx';
 const CL=["#e6194b","#3cb44b","#ffe119","#4363d8","#f58231","#911eb4","#42d4f4","#f032e6","#bfef45","#fabed4","#469990","#dcbeff","#9A6324","#800000","#aaffc3","#808000"];
 function hC(t){return[t<.5?0:(t-.5)*2,t<.5?t*2:(1-t)*2,t<.5?(.5-t)*2:0];}
 function nS(r){if(r<=0)return 1;const raw=r/6,mg=10**Math.floor(Math.log10(raw)),n=raw/mg;return(n<1.5?1:n<3.5?2:n<7.5?5:10)*mg;}
@@ -30,7 +33,7 @@ const FORELAS_BIBTEX=`@software{forelas_2026,
 }`;
 
 function HeroPhoto(){return <img className="forest-background" src={import.meta.env.BASE_URL+"forest-lidar-4k.jpg"} alt="彩色单木分割森林点云，展示林冠与树木结构" fetchPriority="high"/>;}
-const WORKSPACE_MODULES=[["tools","◈","数据与显示","点云属性与地面模型"],["clip","⌖","样地裁剪","圈定研究范围"],["seg","⌘","单木分割","冠层识别与窗口设置"],["metrics","▤","单木指标","树高、冠幅与实测值"],["area","▦","林分统计","高度分布与冠层覆盖"],["stats","⌁","精度评估","自动与实测结果对比"],["species","♧","树种模型","胸径与生物量估算"],["transect","⤴","垂直剖面","样线与冠层结构"]];
+const WORKSPACE_MODULES=[["tools","◈","数据与显示","点云属性与地面模型"],["clip","⌖","样地裁剪","圈定研究范围"],["seg","⌘","单木分割","冠层识别与窗口设置"],["metrics","▤","单木指标","树高、冠幅与实测值"],["species","♧","树种模型","胸径与生物量估算"],["volume","▥","蓄积评估","单木材积与林分蓄积评估"],["area","▦","林分统计","高度分布与蓄积量汇总"],["stats","⌁","精度评估","自动与实测结果对比"],["transect","⤴","垂直剖面","样线与冠层结构"]];
 
 export default function App(){
 const[data,setData]=useState(null);const[zN,setZN]=useState(null);const[bnd,setBnd]=useState(null);const[msg,setMsg]=useState("");
@@ -38,6 +41,8 @@ const[fileName,setFileName]=useState("");
 const[cc,setCC]=useState(null);const[cr,setCR]=useState(15);const[cs,setCS]=useState("circle");
 const[clp,setClp]=useState(null);const[clpZ,setClpZ]=useState(null);const[clpB,setClpB]=useState(null);
 const[segs,setSegs]=useState(null);const[met,setMet]=useState(null);const[areaMet,setAreaMet]=useState(null);const[areaErr,setAreaErr]=useState("");
+const[volumeConfig,setVolumeConfig]=useState(null);const[clipRoi,setClipRoi]=useState(null);
+const[volumeDraft,setVolumeDraft]=useState(DEFAULT_VOLUME_OPTIONS);
 const[sel,setSel]=useState(null);const[sp,setSp]=useState("ps");const[cMode,setCMode]=useState("height");const[view,setView]=useState("2d");
 const[ptSz,setPtSz]=useState(1.5);const[ptPct,setPtPct]=useState(100);const[sCell,setSCell]=useState(0.5);const[sMinH,setSMinH]=useState(2);const[sSR,setSSR]=useState(3);
 const[loadMode,setLoadMode]=useState("auto");const[loadPct,setLoadPct]=useState(100);
@@ -51,11 +56,14 @@ const[tab,setTab]=useState("tools");const[theme,setTheme]=useState("dark");const
 const[tMode,setTMode]=useState(false);const[tP1,setTP1]=useState(null);const[tP2,setTP2]=useState(null);const[tData,setTData]=useState(null);
 const[showLaz,setShowLaz]=useState(true);const[showCite,setShowCite]=useState(false);const[citeCopied,setCiteCopied]=useState(false);
 const topR=useRef(null),sideR=useRef(null),transR=useRef(null),threeR=useRef(null),cleanR=useRef(null);
+const inspectorContentR=useRef(null);
+useEffect(()=>{inspectorContentR.current?.scrollTo({top:0});},[tab]);
 const dragR=useRef({on:false,moved:false,sx:0,sy:0,px:0,py:0});
 const dR=useRef(),zR=useRef(),cR=useRef(),czR=useRef(),mR=useRef();
 dR.current=data;zR.current=zN;cR.current=clp;czR.current=clpZ;mR.current=met;
 const cam3D=useRef({theta:Math.PI/4,phi:Math.PI/3.2,dist:0});
 const aP=clp||data,aZ=clpZ||zN,aB=clp?clpB:bnd;
+const volumeSummary=useMemo(()=>summarizeVolumes(met,aB,clipRoi,volumeConfig?.areaOverride??''),[met,aB,clipRoi,volumeConfig]);
 const dk=theme==="dark"?"#041510":"#f0f6f2",pn2=theme==="dark"?"#0b241c":"#ffffff",bd=theme==="dark"?"#28523e":"#cfdfd4";
 const ac=theme==="dark"?"#9cf5bc":"#187548",gn2=theme==="dark"?"#86efac":"#237c4e",og=theme==="dark"?"#f5c578":"#97601d",tx=theme==="dark"?"#ecfff3":"#183526",txD=theme==="dark"?"#88aa98":"#647e6f",txM=theme==="dark"?"#b0cbbd":"#4c6b59";
 const BT=on=>({padding:"8px 12px",background:on?ac+"1a":pn2,color:on?ac:txM,border:`1px solid ${on?ac+"66":bd}`,borderRadius:7,cursor:"pointer",fontSize:13,fontFamily:"inherit",fontWeight:on?650:500});
@@ -68,29 +76,31 @@ const handleFile=useCallback((e,samplePercent=appliedSamplingR.current)=>{const 
   return runProcess("点云导入与预处理","load",{file:f,samplePercent,dtmSrc,extDTM},({pts,bounds,normalized,notice,useAuto})=>{
     sourceFileR.current=f;appliedSamplingR.current=samplePercent;
     setData(pts);setFileName(f.name);setBnd(bounds);setZN(normalized);if(useAuto)setDtmSrc("auto");
-    setCC(null);setClp(null);setClpZ(null);setClpB(null);setSegs(null);setMet(null);setAreaMet(null);setAreaErr("");setSel(null);setView("2d");setCMode("height");setPan({x:0,y:0});setZoom(1);setTMode(false);setTP1(null);setTP2(null);setTData(null);cam3D.current={theta:Math.PI/4,phi:Math.PI/3.2,dist:0};
+    setCC(null);setClp(null);setClipRoi(null);setClpZ(null);setClpB(null);setSegs(null);setMet(null);setVolumeConfig(null);setVolumeDraft(DEFAULT_VOLUME_OPTIONS);setAreaMet(null);setAreaErr("");setSel(null);setView("2d");setCMode("height");setPan({x:0,y:0});setZoom(1);setTMode(false);setTP1(null);setTP2(null);setTData(null);cam3D.current={theta:Math.PI/4,phi:Math.PI/3.2,dist:0};
     setMsg(notice);setTab("tools");
   });},[dtmSrc,extDTM,runProcess]);
 const handleDTM=useCallback(e=>{const f=e.target.files[0];if(!f)return;
   return runProcess("加载地面模型","dtm",{file:f},dtm=>{setExtDTM(dtm);setDtmSrc("external");setMsg(`✓ DTM 已加载（${dtm.w}×${dtm.h} 格网）`);});},[runProcess]);
 const hClip=useCallback(()=>{if(!data||!cc||!zN)return;
-  return runProcess("样地点云裁剪","clip",{x:cc.x,y:cc.y,radius:cr,shape:cs},({pts,zN,bounds})=>{setClp(pts);setClpZ(zN);setClpB(bounds);setSegs(null);setMet(null);setAreaMet(null);setAreaErr("");setPan({x:0,y:0});setZoom(1);setMsg("");});},[data,zN,cc,cr,cs,runProcess]);
+  return runProcess("样地点云裁剪","clip",{x:cc.x,y:cc.y,radius:cr,shape:cs},({pts,zN,bounds})=>{setClp(pts);setClipRoi({shape:cs,r:cr});setClpZ(zN);setClpB(bounds);setSegs(null);setMet(null);setVolumeConfig(null);setVolumeDraft(DEFAULT_VOLUME_OPTIONS);setAreaMet(null);setAreaErr("");setPan({x:0,y:0});setZoom(1);setMsg("");});},[data,zN,cc,cr,cs,runProcess]);
 const hSeg=useCallback(()=>{if(!dR.current||!zR.current)return;
-  return runProcess("单木分割与指标提取","segment",{useClip:!!clp,cell:sCell,minHeight:sMinH,radius:sSR,vwsMode,vwsPreset,vwsCustom,crownMode},({segments,metrics})=>{setSegs(segments);setCMode("segment");setMet(metrics);setMsg("");setTab("metrics");});},[clp,sCell,sMinH,sSR,vwsMode,vwsPreset,vwsCustom,crownMode,runProcess]);
+  return runProcess("单木分割与指标提取","segment",{useClip:!!clp,cell:sCell,minHeight:sMinH,radius:sSR,vwsMode,vwsPreset,vwsCustom,crownMode},({segments,metrics})=>{setSegs(segments);setVolumeConfig(null);setVolumeDraft(DEFAULT_VOLUME_OPTIONS);setAreaMet(null);setAreaErr("");setCMode("segment");setMet(metrics);setMsg("");setTab("metrics");});},[clp,sCell,sMinH,sSR,vwsMode,vwsPreset,vwsCustom,crownMode,runProcess]);
 const hArea=useCallback(()=>{if(!dR.current||!zR.current)return;
-  const roi=(clp&&cc)?{shape:cs,r:cr}:null;
-  return runProcess("林分统计计算","area",{useClip:!!clp,metrics:mR.current,roi},r=>{if(typeof r==="string"){setAreaErr(r);setAreaMet(null);}else{setAreaMet(r);setAreaErr("");}setMsg("");});},[clp,cc,cs,cr,runProcess]);
+  return runProcess("林分统计计算","area",{useClip:!!clp,metrics:mR.current,roi:clipRoi},r=>{if(typeof r==="string"){setAreaErr(r);setAreaMet(null);}else{setAreaMet(r);setAreaErr("");}setMsg("");});},[clp,clipRoi,runProcess]);
 const hSp=useCallback(()=>{if(!met)return;
-  return runProcess("应用树种模型","species",{metrics:met,sp},({metrics,notice})=>{setMet(metrics);setMsg(notice);});},[met,sp,runProcess]);
-const hCSV=useCallback(()=>{if(!met)return;return runProcess("导出单木指标",async report=>{report(25,"整理单木指标与林分统计");let csv="ID,H_auto,CD_auto,CPA,CD_bbox,CD_convex,CD_concave,CPA_bbox,CPA_convex,CPA_concave,CrownMethod,CenterX,CenterY,DBH_model,H_manual,CD_manual,DBH_manual,Species,Biomass_total_kg,Biomass_stem_kg,Biomass_branch_kg,Biomass_bark_kg,Biomass_needle_kg,Points,DBH_model_method,DBH_model_status\n";csv+=met.map(m=>`${m.id},${m.h.toFixed(2)},${m.cd.toFixed(2)},${m.cpa.toFixed(2)},${m.cdBbox?.toFixed(2)||""},${m.cdConvex?.toFixed(2)||""},${m.cdConcave?.toFixed(2)||""},${m.cpaBbox?.toFixed(2)||""},${m.cpaConvex?.toFixed(2)||""},${m.cpaConcave?.toFixed(2)||""},${m.crownMethod||""},${m.cx.toFixed(2)},${m.cy.toFixed(2)},${m.dbhModel?.toFixed(1)||""},${m.hManual||""},${m.cdManual||""},${m.dbhManual||""},${m.species||""},${m.bm_total?.toFixed(2)||""},${m.bm_stem?.toFixed(2)||""},${m.bm_branch?.toFixed(2)||""},${m.bm_bark?.toFixed(2)||""},${m.bm_needle?.toFixed(2)||""},${m.cnt},${m.modelId||""},${m.dbhStatus||""}`).join("\n");if(areaMet)csv+="\n\nAREA_METRICS\n"+Object.entries(areaMet).map(([k,v])=>`${k},${typeof v==="number"?v.toFixed(3):v}`).join("\n");dlF(new Blob(["\uFEFF"+csv],{type:"text/csv"}),"foreLas_tree_metrics.csv");});},[met,areaMet,runProcess]);
-const hAreaCSV=useCallback(()=>{if(!areaMet)return;return runProcess("导出林分统计",async report=>{report(25,"整理林分统计表格");let csv="Metric,Value\n";Object.entries(areaMet).forEach(([k,v])=>{csv+=`${k},${typeof v==="number"?v.toFixed(4):v}\n`;});dlF(new Blob(["\uFEFF"+csv],{type:"text/csv"}),"foreLas_area_metrics.csv");});},[areaMet,runProcess]);
+  return runProcess("应用树种模型","species",{metrics:met,sp,volumeOptions:volumeConfig},({metrics,notice})=>{setMet(metrics);setMsg(notice);});},[met,sp,volumeConfig,runProcess]);
+const hSpAndAssess=useCallback(async()=>{const result=await hSp();if(result?.metrics)setTab("volume");},[hSp]);
+const hVolume=useCallback(options=>runProcess("蓄积评估计算","volume",{metrics:mR.current,options},({metrics})=>{setMet(metrics);setVolumeConfig(options);setMsg("");}),[runProcess]);
+const hCSV=useCallback(()=>{if(!met)return;return runProcess("导出单木指标",async report=>{report(25,"整理单木指标、材积与林分统计");dlF(new Blob(["\uFEFF"+treeMetricsCSV(met,areaMet,volumeSummary,volumeConfig)],{type:"text/csv;charset=utf-8"}),"foreLas_tree_metrics.csv");});},[met,areaMet,volumeSummary,volumeConfig,runProcess]);
+const hAreaCSV=useCallback(()=>{if(!areaMet)return;return runProcess("导出林分统计",async report=>{report(25,"整理林分与蓄积量统计");dlF(new Blob(["\uFEFF"+areaMetricsCSV(areaMet,volumeSummary,volumeConfig)],{type:"text/csv;charset=utf-8"}),"foreLas_area_metrics.csv");});},[areaMet,volumeSummary,volumeConfig,runProcess]);
+const hVolumeCSV=useCallback(()=>{if(!met||!volumeConfig)return;return runProcess("导出蓄积评估",async report=>{report(25,"整理单木材积与统计");dlF(new Blob(["\uFEFF"+volumeCSV(met,volumeSummary,volumeConfig)],{type:"text/csv;charset=utf-8"}),"foreLas_volume.csv");});},[met,volumeSummary,volumeConfig,runProcess]);
 const hImg=useCallback(()=>runProcess("导出当前视图",async report=>{report(25,"生成视图图像");if(view==="3d"){const el=threeR.current;if(!el)return;const wc=el.querySelector("canvas");if(!wc)return;try{const url=wc.toDataURL("image/png");const a=document.createElement("a");a.href=url;a.download="foreLas_3d.png";document.body.appendChild(a);a.click();document.body.removeChild(a);}catch(err){throw new Error("图像导出失败："+err.message);}
 }else{const cv=topR.current;if(!cv)return;const W=cv.width,H=cv.height;const tmp=document.createElement("canvas");tmp.width=W;tmp.height=H;const ctx=tmp.getContext("2d");ctx.drawImage(cv,0,0);
 const m=mR.current;if(m&&m.length>0&&cv._tr){const{oX,oY,sc,xMn,yMn}=cv._tr;const isDk=theme==="dark";ctx.font="bold 18px monospace";ctx.textAlign="center";ctx.textBaseline="middle";
 m.forEach(t=>{const rx=t.cxRel!==undefined?t.cxRel:t.cx,ry=t.cyRel!==undefined?t.cyRel:t.cy;const px=oX+(rx-xMn)*sc,py=oY-(ry-yMn)*sc;if(px<0||px>W||py<0||py>H)return;ctx.fillStyle=isDk?"#000000cc":"#ffffffcc";ctx.beginPath();ctx.arc(px,py,12,0,Math.PI*2);ctx.fill();ctx.fillStyle=isDk?"#ffffff":"#000000";ctx.fillText(t.id,px,py);});}
 ctx.font="bold 20px monospace";ctx.fillStyle=ac;ctx.textAlign="left";ctx.textBaseline="top";ctx.fillText(`${FORELAS_NAME} ${FORELAS_VERSION} · 激光点云林木分析系统`,10,10);await new Promise((resolve,reject)=>tmp.toBlob(blob=>{if(blob){dlF(blob,"foreLas_map.png");resolve();}else reject(new Error("图像导出失败"));},"image/png"));}}),[view,theme,runProcess]);
-const uMet=useCallback((id,f,v)=>{setMet(prev=>prev.map(m=>m.id===id?{...m,[f]:v}:m));},[]);
-const hReset=()=>{setClp(null);setClpZ(null);setClpB(null);setSegs(null);setMet(null);setAreaMet(null);setAreaErr("");setCC(null);setSel(null);setCMode("height");setPan({x:0,y:0});setZoom(1);setTP1(null);setTP2(null);setTData(null);};
+const uMet=useCallback((id,f,v)=>{setMet(prev=>prev.map(m=>{if(m.id!==id)return m;const updated={...m,[f]:v};return volumeConfig&&(f==="dbhManual"||f==="hManual")?calculateTreeVolume(updated,volumeConfig):updated;}));},[volumeConfig]);
+const hReset=()=>{setClp(null);setClipRoi(null);setClpZ(null);setClpB(null);setSegs(null);setMet(null);setVolumeConfig(null);setVolumeDraft(DEFAULT_VOLUME_OPTIONS);setAreaMet(null);setAreaErr("");setCC(null);setSel(null);setCMode("height");setPan({x:0,y:0});setZoom(1);setTP1(null);setTP2(null);setTData(null);};
 const cSt=useCallback(pairs=>{if(!pairs||pairs.length<3)return null;const n=pairs.length,df=n-1,diffs=pairs.map(p=>p.a-p.b),mD=diffs.reduce((s,v)=>s+v,0)/n,rmse=Math.sqrt(diffs.reduce((s,v)=>s+v*v,0)/n);const mA=pairs.reduce((s,p)=>s+p.a,0)/n,mB=pairs.reduce((s,p)=>s+p.b,0)/n;let sAB=0,sAA=0,sBB=0;pairs.forEach(p=>{sAB+=(p.a-mA)*(p.b-mB);sAA+=(p.a-mA)**2;sBB+=(p.b-mB)**2;});const r2=sAA>0&&sBB>0?(sAB/(Math.sqrt(sAA)*Math.sqrt(sBB)))**2:0;const se=Math.sqrt(diffs.reduce((s,v)=>s+(v-mD)**2,0)/(n*(n-1)));const ts=se>0?mD/se:0;const ax=Math.abs(ts),tt=1/(1+.2316419*ax),nd=.3989422804*Math.exp(-ax*ax/2),pt=nd*tt*(.3193815+tt*(-.3565638+tt*(1.781478+tt*(-1.821256+tt*1.330274)))),cf=df<30?1+1/(4*df)+(1+2*ax*ax)/(16*df*df):1,pv=Math.min(1,2*pt*cf);return{n,rmse:rmse.toFixed(2),bias:mD.toFixed(2),r2:r2.toFixed(3),t:ts.toFixed(2),p:pv<.001?"<0.001":pv.toFixed(3)};},[]); 
 
 // --- draw 2D (topR size stays fixed) ---
@@ -230,7 +240,7 @@ if(!data)return(
     <div className="workspace-viewer-footer"><span><i/> {view==="2d"?"平面与高程同步展示":"拖动旋转 · 滚轮缩放"}</span><span>{cMode==="segment"?"单木分割着色":cMode==="classification"?"ASPRS 分类":cMode==="normalized"?"相对地面高度":cMode==="intensity"?"激光回波强度":cMode==="rgb"?"RGB 真彩色":"原始高程着色"}</span></div>
    </section>
   </main>
-  <aside className="workspace-inspector" aria-label="分析参数"><div className="workspace-inspector-heading"><small>PARAMETERS & RESULTS</small><h2>{WORKSPACE_MODULES.find(m=>m[0]===tab)?.[2]}</h2><p>{WORKSPACE_MODULES.find(m=>m[0]===tab)?.[3]}</p></div><div className="workspace-panel-content">
+  <aside className="workspace-inspector" aria-label="分析参数"><div className="workspace-inspector-heading"><small>PARAMETERS & RESULTS</small><h2>{WORKSPACE_MODULES.find(m=>m[0]===tab)?.[2]}</h2><p>{WORKSPACE_MODULES.find(m=>m[0]===tab)?.[3]}</p></div><div className="workspace-panel-content" ref={inspectorContentR}>
 
 {tab==="tools"&&(<><Sc t="分析抽样比例">
 <div className="workspace-sampling-modes">
@@ -298,22 +308,24 @@ if(!data)return(
 {segs&&<div style={{color:gn2,fontSize:12,marginTop:4}}>{met?`已测量 ${met.length} 棵树（${segs.count} 个段）`:`${segs.count} 个段`}</div>}
 </Sc>)}
 
+{tab==="volume"&&<VolumePanel metrics={met} summary={volumeSummary} applied={volumeConfig} draft={volumeDraft} onDraftChange={setVolumeDraft} bounds={aB} roi={clipRoi} onSegment={()=>setTab("seg")} onApply={hVolume} onExport={hVolumeCSV} onMetrics={()=>setTab("metrics")} onSpecies={()=>setTab("species")}/>}
+
 {tab==="metrics"&&(<Sc t="单木指标">{!met?<div style={{fontSize:12,color:txD}}>请先运行分割</div>:(
-<div style={{overflowX:"auto"}}><button style={{...BT(true),marginBottom:6,fontSize:11}} onClick={hCSV}>📥 CSV</button>
-<table style={{width:"100%",borderCollapse:"collapse",fontSize:10}}><thead><tr>{["#","H","CD","X","Y","DBH₁","DBH₂","H₂","CD₂","N"].map(h=><th key={h} style={{textAlign:"left",padding:"2px",borderBottom:`1px solid ${bd}`,color:txD,fontWeight:500}}>{h}</th>)}</tr></thead>
+<div style={{overflowX:"auto"}}><button style={{...BT(true),marginBottom:6,fontSize:11}} onClick={hCSV}>📥 CSV</button><button style={{...BT(false),marginLeft:8,marginBottom:6,fontSize:11}} onClick={()=>setTab("volume")}>蓄积评估 →</button><p className="workspace-sampling-note">表格显示前 200 棵树，CSV 导出与蓄积量统计包含全部单木指标记录。</p>
+<table style={{width:"100%",borderCollapse:"collapse",fontSize:10}}><thead><tr>{["#","H","CD","X","Y","DBH₁","DBH₂","H₂","CD₂","V (m³)","N"].map(h=><th key={h} style={{textAlign:"left",padding:"2px",borderBottom:`1px solid ${bd}`,color:txD,fontWeight:500}}>{h}</th>)}</tr></thead>
 <tbody>{met.slice(0,200).map((m,i)=>(<tr key={m.id} style={{background:sel===m.id?ac+"15":i%2===0?"transparent":bd+"22",cursor:"pointer"}} onClick={()=>{setSel(sel===m.id?null:m.id);setCMode("segment");}}>
 <td style={{padding:"2px",color:CL[(m.id-1)%CL.length],fontWeight:700}}>{m.id}</td><td style={{padding:"2px"}}>{m.h.toFixed(1)}</td><td style={{padding:"2px"}}>{m.cd.toFixed(1)}</td>
 <td style={{padding:"2px",fontSize:9}}>{m.cx.toFixed(1)}</td><td style={{padding:"2px",fontSize:9}}>{m.cy.toFixed(1)}</td><td style={{padding:"2px",color:m.dbhExtrapolated?og:gn2}} title={m.dbhStatus||"模型估算胸径（cm）"}>{m.dbhModel?.toFixed(1)||"–"}</td>
-<td style={{padding:"1px"}}><input value={m.dbhManual} onChange={e=>uMet(m.id,"dbhManual",e.target.value)} style={{...IN,width:26,padding:"1px 2px"}}/></td>
-<td style={{padding:"1px"}}><input value={m.hManual} onChange={e=>uMet(m.id,"hManual",e.target.value)} style={{...IN,width:26,padding:"1px 2px"}}/></td>
-<td style={{padding:"1px"}}><input value={m.cdManual} onChange={e=>uMet(m.id,"cdManual",e.target.value)} style={{...IN,width:26,padding:"1px 2px"}}/></td>
-<td style={{padding:"2px"}}>{m.cnt}</td></tr>))}</tbody></table>
-{met.some(m=>GUIZHOU_MODELS.some(s=>s.id===m.modelId))&&<p className="workspace-sampling-note">贵州马尾松模型的 DBH₁ 为材积反推的间接估算（cm），橙色值超出文献样本范围；“—”表示输入无效或胸径超出 4–66 cm 求解范围。DBH₂、H₂、CD₂ 仅用于实测对比。</p>}
-{met.some(m=>m.modelId===FIR_DBH_MODEL.id)&&<p className="workspace-sampling-note">杉木 DBH₁ 按东西、南北平均冠幅回归估算（cm）；橙色值超出 2.17–4.73 m 冠幅样本范围。“—”表示平均冠幅无效。模型来自湖南株洲，尚未在贵州校准；DBH₂ 用于实测对比。</p>}
-{met.some(m=>COMMON_SPECIES_MODELS.some(s=>s.id===m.modelId))&&<p className="workspace-sampling-note">华山松、云南松 DBH₁ 为云南样本树高曲线的间接反求值（cm），尚未在贵州校准。超出样本范围不输出；柏木、软阔、硬阔缺少已核实胸径模型，暂显示“—”。实测 DBH₂ 仅用于精度对比。</p>}
+<td style={{padding:"1px"}}><input aria-label={`树 ${m.id} 实测胸径 cm`} type="number" min="0" step="any" value={m.dbhManual} onChange={e=>uMet(m.id,"dbhManual",e.target.value)} onClick={e=>e.stopPropagation()} style={{...IN,width:46,padding:"1px 2px"}}/></td>
+<td style={{padding:"1px"}}><input aria-label={`树 ${m.id} 实测树高 m`} type="number" min="0" step="any" value={m.hManual} onChange={e=>uMet(m.id,"hManual",e.target.value)} onClick={e=>e.stopPropagation()} style={{...IN,width:46,padding:"1px 2px"}}/></td>
+<td style={{padding:"1px"}}><input aria-label={`树 ${m.id} 实测冠幅 m`} type="number" min="0" step="any" value={m.cdManual} onChange={e=>uMet(m.id,"cdManual",e.target.value)} onClick={e=>e.stopPropagation()} style={{...IN,width:46,padding:"1px 2px"}}/></td>
+<td style={{padding:"2px",color:gn2}} title={m.volumeStatus}>{Number.isFinite(m.volume)?m.volume.toFixed(4):"—"}</td><td style={{padding:"2px"}}>{m.cnt}</td></tr>))}</tbody></table>
+{met.some(m=>GUIZHOU_MODELS.some(s=>s.id===m.modelId))&&<p className="workspace-sampling-note">贵州马尾松模型的 DBH₁ 为材积反推的间接估算（cm），橙色值超出文献样本范围；“—”表示输入无效或胸径超出 4–66 cm 求解范围。DBH₂、H₂、CD₂ 不参与 DBH₁ 推算；蓄积评估中可另选实测胸径和树高。</p>}
+{met.some(m=>m.modelId===FIR_DBH_MODEL.id)&&<p className="workspace-sampling-note">杉木 DBH₁ 按东西、南北平均冠幅回归估算（cm）；橙色值超出 2.17–4.73 m 冠幅样本范围。“—”表示平均冠幅无效。模型来自湖南株洲，尚未在贵州校准；DBH₂ 用于实测对比，也可在蓄积评估中选择。</p>}
+{met.some(m=>COMMON_SPECIES_MODELS.some(s=>s.id===m.modelId))&&<p className="workspace-sampling-note">华山松、云南松 DBH₁ 为云南样本树高曲线的间接反求值（cm），尚未在贵州校准。超出样本范围不输出；柏木、软阔、硬阔缺少已核实胸径模型，暂显示“—”。实测 DBH₂ 可用于精度对比和材积计算。</p>}
 </div>)}</Sc>)}
 
-{tab==="area"&&(<Sc t="区域统计">
+{tab==="area"&&(<><Sc t="区域统计">
 <button style={{...BT(true),width:"100%",marginBottom:4}} onClick={hArea}>📊 计算</button>
 {areaMet&&<button style={{...BT(true),width:"100%",marginBottom:8,fontSize:11}} onClick={hAreaCSV}>📥 导出 CSV</button>}
 {areaErr&&<div style={{fontSize:11,color:og,marginBottom:6,padding:4,background:og+"11",borderRadius:4}}>⚠ {areaErr}</div>}
@@ -327,7 +339,7 @@ if(!data)return(
 {[["D1",areaMet.d1],["D3",areaMet.d3],["D5",areaMet.d5],["D7",areaMet.d7],["D9",areaMet.d9],["CC₁.₃",areaMet.cc13]].map(([k,v])=><div key={k} style={{display:"flex",justifyContent:"space-between"}}><span>{k}</span><span style={{color:tx}}>{(v*100).toFixed(1)}%</span></div>)}
 <div style={{fontSize:12,fontWeight:600,color:ac,marginTop:8,marginBottom:4}}>ITC</div>
 {[["树木数",areaMet.itc_n],["最大",areaMet.itc_max.toFixed(1)+" m"],["最小",areaMet.itc_min.toFixed(1)+" m"],["平均",areaMet.itc_mean.toFixed(1)+" m"],["N/ha",areaMet.density.toFixed(0)]].map(([k,v])=><div key={k} style={{display:"flex",justifyContent:"space-between"}}><span>{k}</span><span style={{color:tx}}>{v}</span></div>)}
-</div>)}</Sc>)}
+</div>)}</Sc><Sc t="蓄积评估汇总"><VolumeSummary summary={volumeSummary} configured={!!volumeConfig}/><button style={BT(false)} onClick={()=>setTab("volume")}>打开蓄积评估 →</button></Sc></>)}
 
 {tab==="stats"&&(<Sc t="统计分析">{!met?<div style={{fontSize:12,color:txD}}>请先运行分割</div>:(()=>{
 const wH=met.filter(m=>m.hManual!==""&&!isNaN(+m.hManual)),wC=met.filter(m=>m.cdManual!==""&&!isNaN(+m.cdManual)),wD=met.filter(m=>m.dbhManual!==""&&!isNaN(+m.dbhManual)&&m.dbhModel);
@@ -342,10 +354,10 @@ return(<><div style={{fontSize:11,color:txD,marginBottom:8}}>输入手动测量�
 <div style={{fontSize:11,color:txD,marginBottom:6,padding:"4px 6px",background:dk,borderRadius:3,borderLeft:`2px solid ${ac}`}}>📖 {SP.find(s=>s.id===sp)?.ref||""}</div>
 {COMMON_SPECIES_MODELS.find(s=>s.id===sp)&&(()=>{const model=COMMON_SPECIES_MODELS.find(s=>s.id===sp);return <div className="workspace-sampling-note">{model.available?<><p>{model.formula}。H 为点云树高（m），DBH₁ 为胸径（cm）。</p><p>样本范围：树高 {model.hMin}–{model.hMax} m，胸径 {model.dMin}–{model.dMax} cm。任一超范围时不输出数值。</p><p>文献原模型由胸径预测树高，这里作数学反求，未独立验证胸径预测精度，也未在贵州校准。</p><a href={model.sourceUrl} target="_blank" rel="noopener noreferrer">查看模型文献 ↗</a></>:<p style={{color:og}}>{model.reason}</p>}<p>另已核对并收录 {model.volumeModel.ref}，它需要已知胸径与树高，不能单独生成 DBH₁。</p><p style={{overflowWrap:"anywhere"}}>{model.volumeModel.formula}</p></div>;})()}
 {sp===FIR_DBH_MODEL.id&&<div className="workspace-sampling-note"><p>{FIR_DBH_MODEL.area}</p><p>{FIR_DBH_MODEL.formula}。C 为东西、南北平均冠幅（m），DBH₁ 为胸径（cm）；使用平均冠幅而非凸包最大跨度，无需填写实测胸径。</p><p>文献冠幅样本范围为 2.17–4.73 m。超范围结果标色，仅供参考；建议用 DBH₂ 实测值检验。此模型不估算单木生物量或碳储量。</p><a href={FIR_DBH_MODEL.sourceUrl} target="_blank" rel="noopener noreferrer">查看胸径模型文献 ↗</a></div>}
-{GUIZHOU_MODELS.find(s=>s.id===sp)&&(()=>{const model=GUIZHOU_MODELS.find(s=>s.id===sp);return <div className="workspace-sampling-note"><p>{model.area}</p><p>使用点云树高 H 与东西、南北平均冠幅 C，先按论文 M2 估算材积 V = 0.0001 × H^2.982 × C^0.007，再用对应产区公式反求 DBH₁（cm）。无需填写实测胸径。</p><p>这是间接估算方案，尚未用本地实测胸径验证。超出文献样本范围的结果会标色；超出 4–66 cm 求解范围时不输出数值。实测值仅用于精度对比。</p>{model.transferNote&&<p style={{color:og}}>{model.transferNote}</p>}</div>;})()}
+{GUIZHOU_MODELS.find(s=>s.id===sp)&&(()=>{const model=GUIZHOU_MODELS.find(s=>s.id===sp);return <div className="workspace-sampling-note"><p>{model.area}</p><p>使用点云树高 H 与东西、南北平均冠幅 C，先按论文 M2 估算材积 V = 0.0001 × H^2.982 × C^0.007，再用对应产区公式反求 DBH₁（cm）。无需填写实测胸径。</p><p>这是间接估算方案，尚未用本地实测胸径验证。超出文献样本范围的结果会标色；超出 4–66 cm 求解范围时不输出数值。实测值不参与 DBH₁ 推算；可在蓄积评估模块选择实测胸径和树高。</p>{model.transferNote&&<p style={{color:og}}>{model.transferNote}</p>}</div>;})()}
 {SP.find(s=>s.id===sp)?.experimental&&<div style={{fontSize:11,color:og,marginBottom:6,padding:"4px 6px",background:dk,borderRadius:3,borderLeft:`2px solid ${og}`,fontWeight:600}}>⚠ "BETA：该树种的土耳其校准系数尚未验证，结果仅供参考。"</div>}
 {sp.startsWith("pb")&&<div style={{fontSize:11,color:gn2,marginBottom:6,padding:"4px 6px",background:dk,borderRadius:3,borderLeft:`2px solid ${gn2}`}}>🌲 "生物量：Sönmez et al. 2016"</div>}
-<button style={{...BT(true),width:"100%"}} onClick={hSp} disabled={!met||met.length===0}>应用模型</button></Sc>)}
+<button style={{...BT(true),width:"100%"}} onClick={hSp} disabled={!met||met.length===0}>应用模型</button><button style={{...BT(false),width:"100%",marginTop:8}} onClick={hSpAndAssess} disabled={!met?.length}>应用并进入蓄积评估 →</button></Sc>)}
 
 {tab==="transect"&&(<Sc t="垂直剖面"><div style={{fontSize:11,color:txD,marginBottom:6}}>在 2D 视图中点击 2 个点</div>
 <button style={{...BT(!tMode),width:"100%",marginBottom:4}} onClick={()=>{setTMode(true);setTP1(null);setTP2(null);setTData(null);}}>✏ 绘制样线</button>

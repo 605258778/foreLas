@@ -46,6 +46,20 @@
 .workspace-sampling-controls label{display:flex;align-items:center;gap:4px;color:var(--ws-secondary);font-size:12px}
 .workspace-sampling-controls input:disabled{opacity:.4;cursor:not-allowed}
 .workspace-sampling-note{font-size:11px;line-height:1.7;color:var(--ws-muted);margin:10px 0}
+.volume-controls label{display:grid;gap:7px;margin-bottom:15px;color:var(--ws-secondary);font-size:12px}.volume-controls label small{float:right;color:var(--ws-muted);font-size:10px}
+.volume-controls select,.volume-controls input{width:100%;min-width:0;padding:9px;border:1px solid var(--ws-line);border-radius:6px;background:var(--ws-bg);color:var(--ws-text);font:inherit}
+.volume-controls .workspace-sampling-note{overflow-wrap:anywhere}.volume-controls .workspace-sampling-note p{margin:6px 0}
+.volume-primary{width:100%;padding:10px 12px;border:1px solid var(--ws-accent);border-radius:7px;background:var(--ws-soft);color:var(--ws-accent);font:inherit;font-size:12px}
+.volume-link{display:block;padding:0;margin:8px 0;border:0;background:none;color:var(--ws-accent);text-align:left;font-size:11px}
+.volume-totals{display:grid;gap:10px;margin-bottom:16px}.volume-totals>div{padding:12px;border:1px solid var(--ws-line);border-radius:8px;background:var(--ws-bg)}
+.volume-totals small{font-size:10px;color:var(--ws-muted)}.volume-totals strong{display:block;margin-top:8px;font-size:22px;font-weight:650;color:var(--ws-accent);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.volume-summary dl{margin:0;font-size:11px}.volume-summary dl>div{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--ws-line)}.volume-summary dt{color:var(--ws-muted)}.volume-summary dd{margin:0;color:var(--ws-text);text-align:right;font-variant-numeric:tabular-nums}
+.volume-notice{padding:10px;border-left:2px solid #c6a96d;border-radius:4px;background:#c6a96d0c;color:var(--ws-secondary);font-size:11px;line-height:1.7}
+.volume-controls,.volume-results{width:100%;min-width:0}.volume-controls h3,.volume-results h3{display:flex;justify-content:space-between;align-items:center;gap:8px}.volume-badge{padding:3px 7px;border:1px solid var(--ws-line);border-radius:5px;font-size:10px;font-weight:400;letter-spacing:0;color:var(--ws-secondary);white-space:nowrap}
+.volume-model-details{margin:-3px 0 16px;padding:10px;border:1px solid var(--ws-line);border-radius:6px;background:var(--ws-bg);color:var(--ws-muted);font-size:10px;line-height:1.7;overflow-wrap:anywhere}.volume-model-details summary{cursor:pointer;color:var(--ws-secondary)}.volume-model-details summary span{display:block;font-size:9px;margin-top:3px;color:var(--ws-muted)}.volume-model-details p{margin:8px 0 0}
+.volume-readiness{padding:11px;border:1px solid var(--ws-line);border-radius:7px;background:var(--ws-bg);display:grid;gap:9px;margin-bottom:14px;font-size:11px}.volume-readiness>div{display:flex;justify-content:space-between;gap:8px;color:var(--ws-secondary)}.volume-readiness b{color:var(--ws-accent);font-variant-numeric:tabular-nums}
+.volume-guidance{margin:-5px 0 15px;font-size:11px;color:var(--ws-muted);line-height:1.7}.volume-guidance p{margin:0}.volume-guidance>div{display:flex;gap:14px;flex-wrap:wrap}.volume-guidance .volume-link{margin:6px 0 0}.volume-area-preview{display:flex;justify-content:space-between;gap:10px;margin:-5px 0 16px;font-size:10px;color:var(--ws-muted)}.volume-area-preview b{color:var(--ws-secondary);font-variant-numeric:tabular-nums}
+.volume-actionbar{padding-top:4px}.volume-actionbar .volume-primary{background:var(--ws-accent);color:var(--ws-bg);font-weight:650;min-height:40px}.volume-actionbar small{display:block;margin-top:8px;font-size:10px;line-height:1.6;color:var(--ws-muted)}.volume-notice p{margin:0}.volume-notice .volume-link{margin:6px 0 0}.volume-empty{padding:12px;border:1px dashed var(--ws-line);border-radius:7px;margin-bottom:16px;color:var(--ws-secondary);font-size:11px;line-height:1.7}.volume-empty p{color:var(--ws-muted);margin:6px 0 12px}
 .workspace-sampling-current{font-size:11px;line-height:1.7;color:var(--ws-accent);overflow-wrap:anywhere}
 .analysis-workspace{
   --ws-glow:#65df9b;
